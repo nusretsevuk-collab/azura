@@ -190,6 +190,9 @@ tr:hover td{background:rgba(255,255,255,.1)}
         <div class="hd"><h2>Paketleme Reçetesi (adet)</h2><span class="pill">Boy bazlı</span></div>
         <div class="bd tight">
           <table id="tblPack"></table>
+          <div class="row" style="margin-top:10px;">
+            <div class="col"><button id="addPackExtra">+ Kalem ekle</button></div>
+          </div>
           <div class="mini">Porsiyon/500g ve 1kg için paketleme adetlerini düzenleyebilirsin.</div>
         </div>
       </section>
@@ -242,6 +245,7 @@ const DEFAULT = {
     "500 g":{"Lavaş":0.5,"Pilav paketi (120 g)":1,"Sızdırmaz kap":1,"Köpük tabak":2,"6'lı servis set":1,"Poşet":1},
     "1 kg":{"Lavaş":1,"Pilav paketi (120 g)":2,"Sızdırmaz kap":2,"Köpük tabak":2,"6'lı servis set":1,"Poşet":1}
   },
+  packExtras:[],
   recipes:[
     {urun:"Karışık",boy:"Porsiyon",Bonfile:70,Pirzola:130,Kanat:80,"Köfte":70,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
     {urun:"Bonfile",boy:"Porsiyon",Bonfile:300,Pirzola:0,Kanat:0,"Köfte":0,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
@@ -298,6 +302,12 @@ function costPack(boy,adet=1,ayran=0,ekmek=0){
   const p=STATE.prices, pack=STATE.packBySize[boy];
   let s=0;
   for(const k of Object.keys(pack)) s+=(pack[k]||0)*(p[k]?.price??0);
+  for(const extra of STATE.packExtras){
+    if(!extra) continue;
+    const qty=extra.qty||0;
+    const price=p[extra.item]?.price??0;
+    s+=qty*price;
+  }
   s+=(ayran||0)*p["Ayran"].price;
   s+=(ekmek||0)*p["Ekmek"].price;
   return s*adet;
@@ -327,7 +337,7 @@ function renderPrices(){
   tbl.innerHTML=`<thead><tr><th>Kalem</th><th>Birim</th><th class="right">Birim Fiyat (TL)</th></tr></thead>
   <tbody>${rows.map(([k,v])=>`<tr><td>${k}</td><td class="muted">${v.unit}</td><td class="right"><input data-price="${k}" type="number" step="0.01" value="${v.price}"></td></tr>`).join("")}</tbody>`;
   tbl.querySelectorAll("input[data-price]").forEach(inp=>{
-    inp.addEventListener("input",e=>{const key=e.target.getAttribute("data-price"); STATE.prices[key].price=num(e.target.value); refreshQuick();});
+    inp.addEventListener("input",e=>{const key=e.target.getAttribute("data-price"); STATE.prices[key].price=num(e.target.value); renderPack(); refreshQuick();});
   });
 }
 function renderPack(){
@@ -335,9 +345,49 @@ function renderPack(){
   const items=Object.keys(STATE.packBySize["Porsiyon"]);
   const sizes=Object.keys(STATE.packBySize);
   tbl.innerHTML=`<thead><tr><th>Kalem</th>${sizes.map(s=>`<th class="right">${s}</th>`).join("")}</tr></thead>
-  <tbody>${items.map(it=>`<tr><td>${it}</td>${sizes.map(s=>`<td class="right"><input data-pack="${it}" data-size="${s}" type="number" step="0.1" value="${STATE.packBySize[s][it]??0}"></td>`).join("")}</tr>`).join("")}</tbody>`;
+  <tbody>${items.map(it=>`<tr><td>${it}</td>${sizes.map(s=>`<td class="right"><input data-pack="${it}" data-size="${s}" type="number" step="0.1" value="${STATE.packBySize[s][it]??0}"></td>`).join("")}</tr>`).join("")}
+    <tr><th class="section" colspan="${sizes.length + 1}">Ek Paketleme Kalemleri</th></tr>
+    ${STATE.packExtras.map((row,idx)=>{
+      const item=row?.item||"";
+      const qty=row?.qty??0;
+      const price=STATE.prices[item]?.price??0;
+      const cost=qty*price;
+      return `<tr>
+        <td>
+          <select data-pack-extra-item="${idx}">
+            <option value="">Kalem seç</option>
+            ${Object.keys(STATE.prices).map(key=>`<option value="${key}" ${key===item?"selected":""}>${key}</option>`).join("")}
+          </select>
+        </td>
+        <td class="right"><input data-pack-extra-qty="${idx}" type="number" step="1" min="0" value="${qty}"></td>
+        <td class="right">${fmt(cost)}</td>
+        <td class="right"><button class="btndanger" data-pack-extra-remove="${idx}">Sil</button></td>
+      </tr>`;
+    }).join("")}
+  </tbody>`;
   tbl.querySelectorAll("input[data-pack]").forEach(inp=>{
     inp.addEventListener("input",e=>{const it=e.target.getAttribute("data-pack"); const s=e.target.getAttribute("data-size"); STATE.packBySize[s][it]=num(e.target.value); refreshQuick();});
+  });
+  tbl.querySelectorAll("select[data-pack-extra-item]").forEach(sel=>{
+    sel.addEventListener("change",e=>{
+      const idx=parseInt(e.target.getAttribute("data-pack-extra-item"),10);
+      STATE.packExtras[idx].item=e.target.value;
+      renderPack();refreshQuick();
+    });
+  });
+  tbl.querySelectorAll("input[data-pack-extra-qty]").forEach(inp=>{
+    inp.addEventListener("input",e=>{
+      const idx=parseInt(e.target.getAttribute("data-pack-extra-qty"),10);
+      STATE.packExtras[idx].qty=Math.max(0,Math.round(num(e.target.value)));
+      renderPack();refreshQuick();
+    });
+  });
+  tbl.querySelectorAll("button[data-pack-extra-remove]").forEach(btn=>{
+    btn.addEventListener("click",e=>{
+      const idx=parseInt(e.target.getAttribute("data-pack-extra-remove"),10);
+      STATE.packExtras.splice(idx,1);
+      renderPack();refreshQuick();
+    });
   });
 }
 function renderRecipes(){
@@ -432,6 +482,9 @@ function load(){
     STATE.params=Object.assign({},DEFAULT.params,STATE.params||{});
     STATE.prices=Object.assign({},DEFAULT.prices,STATE.prices||{});
     STATE.packBySize=Object.assign({},DEFAULT.packBySize,STATE.packBySize||{});
+    STATE.packExtras=Array.isArray(STATE.packExtras)
+      ? STATE.packExtras.map(r=>({item:r?.item||"",qty:Math.max(0,Math.round(num(r?.qty)))}))
+      : safeClone(DEFAULT.packExtras);
     STATE.recipes=Array.isArray(STATE.recipes)
       ? STATE.recipes.map(r=>({...r,Ekmek:r.Ekmek??0,Ayran:r.Ayran??0}))
       : safeClone(DEFAULT.recipes);
@@ -465,6 +518,10 @@ document.getElementById("saveBtn").addEventListener("click",save);
 document.getElementById("loadBtn").addEventListener("click",load);
 document.getElementById("resetBtn").addEventListener("click",()=>{ if(confirm("Ekranı varsayılana döndüreyim mi?")) resetAll(); });
 document.getElementById("refreshAll").addEventListener("click",()=>{renderAll(); setPill("Özet yenilendi","ok");});
+document.getElementById("addPackExtra").addEventListener("click",()=>{
+  STATE.packExtras.push({item:"",qty:0});
+  renderPack();refreshQuick();
+});
 
 pushParamsToUI();
 renderAllUI();
