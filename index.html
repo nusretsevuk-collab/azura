@@ -3,690 +3,152 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Günlük Net Kâr Takibi</title>
+<title>Azura — Ana Kontrol</title>
 <style>
 :root{
   --bg:#05070f;
-  --panel:#0e162b;
-  --panel-2:#111e38;
-  --text:#f3f6ff;
-  --muted:#b4c0dd;
-  --accent:#32f5c7;
+  --panel:#0f172a;
+  --panel-2:#121c33;
+  --text:#f2f6ff;
+  --muted:#b6c2e0;
+  --accent:#46f6c6;
   --accent-2:#6aa9ff;
-  --danger:#ff6b81;
-  --warning:#f6c453;
   --line:rgba(255,255,255,.12);
-  --shadow:0 20px 50px rgba(0,0,0,.45);
-  --radius:16px;
+  --shadow:0 18px 45px rgba(0,0,0,.45);
+  --radius:18px;
   font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 }
 
 *{box-sizing:border-box}
+
 body{
   margin:0;
-  background:radial-gradient(1200px 800px at 15% 5%, #1b2d5f 0%, var(--bg) 55%);
+  min-height:100vh;
+  background:radial-gradient(1200px 800px at 18% 12%, #1b2d5f 0%, var(--bg) 55%);
   color:var(--text);
-  line-height:1.5;
-}
-
-header{
-  position:sticky;
-  top:0;
-  z-index:10;
-  padding:18px 24px;
-  background:rgba(5,8,16,.88);
-  backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--line);
-}
-header h1{
-  margin:0;
-  font-size:18px;
-  letter-spacing:.4px;
-  font-weight:750;
-}
-header p{
-  margin:6px 0 0;
-  color:var(--muted);
-  font-size:12.5px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:32px 20px;
 }
 
 main{
-  padding:24px;
+  width:min(960px, 100%);
   display:grid;
-  grid-template-columns:360px 1fr;
-  gap:18px;
+  gap:20px;
 }
 
-@media (max-width:1100px){
-  main{grid-template-columns:1fr}
-}
-
-.card{
+header{
+  padding:24px;
+  border-radius:var(--radius);
   background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
   border:1px solid var(--line);
-  border-radius:var(--radius);
   box-shadow:var(--shadow);
-  overflow:hidden;
 }
-.card .hd{
-  padding:14px 16px;
-  border-bottom:1px solid var(--line);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-}
-.card .hd h2{
+
+header h1{
   margin:0;
-  font-size:14.5px;
+  font-size:26px;
+  letter-spacing:.4px;
+  font-weight:800;
+}
+
+header p{
+  margin:10px 0 0;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:16px;
+}
+
+@media (max-width:840px){
+  .grid{grid-template-columns:1fr}
+}
+
+.card-link{
+  text-decoration:none;
+  color:inherit;
+  border-radius:var(--radius);
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+  padding:22px;
+  box-shadow:var(--shadow);
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  min-height:180px;
+  transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+.card-link .title{
+  font-size:20px;
   font-weight:750;
   letter-spacing:.3px;
 }
-.card .bd{padding:16px}
 
-.row{display:flex;gap:10px;flex-wrap:wrap}
-.col{flex:1 1 150px}
-label{
-  display:block;
-  font-size:11px;
+.card-link .meta{
   color:var(--muted);
-  margin-bottom:6px;
-  font-weight:600;
-  letter-spacing:.2px;
+  font-size:13px;
+  line-height:1.5;
 }
 
-input, select, button{
-  width:100%;
-  padding:10px 12px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.2);
-  background:rgba(4,8,18,.8);
-  color:var(--text);
-  outline:none;
-  transition:.2s ease;
-}
-input:focus, select:focus{
-  border-color:rgba(50,245,199,.7);
-  box-shadow:0 0 0 3px rgba(50,245,199,.25);
-}
-button{
-  cursor:pointer;
-  font-weight:700;
-  background:rgba(50,245,199,.25);
-  border-color:rgba(50,245,199,.5);
-}
-button:hover{transform:translateY(-1px); background:rgba(50,245,199,.35)}
-button.secondary{background:rgba(106,169,255,.18); border-color:rgba(106,169,255,.5)}
-button.danger{background:rgba(255,107,129,.18); border-color:rgba(255,107,129,.5)}
-
-.pill{
-  padding:6px 10px;
-  border-radius:999px;
-  border:1px solid rgba(255,255,255,.2);
-  font-size:11px;
-  color:var(--muted);
-  background:rgba(7,12,22,.75);
-}
-
-.kpi{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-}
-@media (max-width:900px){
-  .kpi{grid-template-columns:1fr}
-}
-
-.kpi .tile{
-  padding:12px;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.18);
-  background:rgba(6,10,20,.78);
-}
-.kpi .tile .label{
-  font-size:10px;
-  color:var(--muted);
-  letter-spacing:.08em;
-  text-transform:uppercase;
-}
-.kpi .tile .value{
-  margin-top:8px;
-  font-weight:800;
-  font-size:20px;
-}
-.value.accent{color:var(--accent)}
-.value.warning{color:var(--warning)}
-.value.danger{color:var(--danger)}
-
-.table-wrap{overflow:auto; border-radius:14px; border:1px solid var(--line)}
-
-table{width:100%; border-collapse:collapse; font-size:12px}
-th, td{padding:9px 8px; border-bottom:1px solid var(--line); text-align:left}
-th{
-  position:sticky;
-  top:0;
-  background:rgba(6,10,20,.95);
-  color:#d8e6ff;
-  text-transform:uppercase;
-  font-size:10px;
-  letter-spacing:.08em;
-}
-tr:nth-child(even) td{background:rgba(255,255,255,.02)}
-tr:hover td{background:rgba(255,255,255,.08)}
-.right{text-align:right}
-.center{text-align:center}
-.muted{color:var(--muted)}
-
-.toggle{
-  display:flex;
+.card-link .cta{
+  margin-top:auto;
+  display:inline-flex;
   align-items:center;
-  gap:10px;
-  background:rgba(7,12,22,.75);
-  padding:8px 10px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.2);
+  gap:8px;
+  font-size:13px;
+  font-weight:700;
+  color:var(--accent);
 }
-.toggle input{width:auto}
 
-.helper{font-size:11.5px; color:var(--muted); margin-top:8px}
+.card-link:hover,
+.card-link:focus-visible{
+  transform:translateY(-2px);
+  border-color:rgba(70,246,198,.6);
+  box-shadow:0 24px 55px rgba(0,0,0,.55);
+  outline:none;
+}
 
-.footer-actions{display:flex; gap:10px; flex-wrap:wrap}
+.card-link.secondary{
+  background:linear-gradient(180deg, rgba(106,169,255,.12), rgba(255,255,255,.02));
+}
+
+.card-link.secondary .cta{color:var(--accent-2)}
+
+footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+}
 </style>
 </head>
 <body>
-<header>
-  <h1>Günlük Net Kâr Takibi</h1>
-  <p>Günlük satışlar, sabit giderler ve kâr hesapları tek sayfada. Tüm veriler otomatik kaydedilir.</p>
-</header>
-
 <main>
-  <section class="card">
-    <div class="hd">
-      <h2>Ayarlar</h2>
-      <span class="pill" id="statusPill">Durum: hazır</span>
-    </div>
-    <div class="bd">
-      <div class="row">
-        <div class="col">
-          <label>PortionProfit (TL)</label>
-          <input id="profitPortion" type="number" step="1" value="140" />
-        </div>
-        <div class="col">
-          <label>Profit500g (TL)</label>
-          <input id="profit500" type="number" step="1" value="140" />
-        </div>
-        <div class="col">
-          <label>Profit1kg (TL)</label>
-          <input id="profit1kg" type="number" step="1" value="235" />
-        </div>
-      </div>
+  <header>
+    <h1>Azura — Ana Kontrol</h1>
+    <p>Azura ekosistemindeki araçlara hızlı erişim için merkezi kontrol paneli.</p>
+  </header>
 
-      <div class="row" style="margin-top:12px;">
-        <div class="col">
-          <label>Ay</label>
-          <select id="monthSelect"></select>
-        </div>
-        <div class="col">
-          <label>Yıl</label>
-          <select id="yearSelect"></select>
-        </div>
-        <div class="col">
-          <label>DaysInMonth</label>
-          <input id="daysInMonth" type="number" min="1" max="31" step="1" />
-        </div>
-      </div>
+  <section class="grid">
+    <a class="card-link" href="https://nusretsevuk-collab.github.io/maliyet-robotu/" target="_blank" rel="noreferrer">
+      <div class="title">📈 Günlük Net Kâr Takip</div>
+      <div class="meta">Günlük satışlar, sabit giderler ve net kâr özetlerini hızlıca görüntüle.</div>
+      <div class="cta">Uygulamayı aç →</div>
+    </a>
 
-      <div class="row" style="margin-top:12px;">
-        <div class="col">
-          <label>Gün sayısını ay/yıla göre otomatik güncelle</label>
-          <div class="toggle">
-            <input id="autoDays" type="checkbox" checked />
-            <span class="muted">Aktif</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="helper">Ay veya yıl değiştiğinde gün sayısı otomatik güncellenir. İstersen DaysInMonth değerini manuel düzenleyebilirsin.</div>
-
-      <div class="row" style="margin-top:14px;">
-        <div class="col"><button id="exportBtn" class="secondary">JSON Dışa Aktar</button></div>
-        <div class="col"><button id="importBtn" class="secondary">JSON İçe Aktar</button></div>
-        <div class="col"><button id="resetBtn" class="danger">Verileri Sıfırla</button></div>
-      </div>
-      <input id="importFile" type="file" accept="application/json" hidden />
-    </div>
+    <a class="card-link secondary" href="https://github.com/nusretsevuk-collab/maliyet-robotu" target="_blank" rel="noreferrer">
+      <div class="title">🧾 Maliyet Robotu</div>
+      <div class="meta">Ana maliyet hesabı deposuna gidin ve en güncel kaynakları görüntüleyin.</div>
+      <div class="cta">Depoya git →</div>
+    </a>
   </section>
 
-  <section style="display:grid; gap:16px;">
-    <section class="card">
-      <div class="hd">
-        <h2>Aylık Sabit Giderler</h2>
-        <button id="addExpense" class="secondary">+ Satır</button>
-      </div>
-      <div class="bd">
-        <div class="table-wrap">
-          <table id="expenseTable">
-            <thead>
-              <tr>
-                <th>ExpenseName</th>
-                <th class="right">AmountTL</th>
-                <th class="center">Sil</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div class="kpi" style="margin-top:12px;">
-          <div class="tile">
-            <div class="label">TotalMonthlyFixedExpenses</div>
-            <div class="value warning" id="totalMonthlyFixed">0 TL</div>
-          </div>
-          <div class="tile">
-            <div class="label">DaysInMonth</div>
-            <div class="value" id="daysDisplay">30</div>
-          </div>
-          <div class="tile">
-            <div class="label">DailyFixedExpense</div>
-            <div class="value accent" id="dailyFixed">0 TL</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="hd">
-        <h2>Günlük Satış Girdileri</h2>
-        <button id="addSale" class="secondary">+ Gün</button>
-      </div>
-      <div class="bd">
-        <div class="table-wrap">
-          <table id="salesTable">
-            <thead>
-              <tr>
-                <th>Tarih</th>
-                <th class="right">PortionQty</th>
-                <th class="right">Qty500g</th>
-                <th class="right">Qty1kg</th>
-                <th class="right">DailyGrossNet</th>
-                <th class="right">DailyRealNet</th>
-                <th class="center">Sil</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="hd">
-        <h2>Özet</h2>
-        <span class="pill">Anlık toplamlara göre güncellenir</span>
-      </div>
-      <div class="bd">
-        <div class="toggle" style="margin-bottom:12px;">
-          <input id="allocateToggle" type="checkbox" checked />
-          <span>Allocate fixed expenses only for entered days</span>
-        </div>
-        <div class="kpi">
-          <div class="tile">
-            <div class="label">TotalGrossNet</div>
-            <div class="value" id="totalGross">0 TL</div>
-          </div>
-          <div class="tile">
-            <div class="label">TotalFixedExpenseAllocated</div>
-            <div class="value warning" id="totalFixedAllocated">0 TL</div>
-          </div>
-          <div class="tile">
-            <div class="label">TotalRealNet</div>
-            <div class="value accent" id="totalReal">0 TL</div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </section>
+  <footer>Bağlantılar yeni sekmede açılır.</footer>
 </main>
-
-<script>
-const STORAGE_KEY = "daily_net_profit_tracker_v1";
-const DEFAULT_STATE = {
-  settings: {
-    portionProfit: 140,
-    profit500g: 140,
-    profit1kg: 235,
-    month: new Date().getMonth(),
-    year: new Date().getFullYear(),
-    daysInMonth: 30,
-    autoDays: true,
-    allocateOnlyEnteredDays: true
-  },
-  expenses: [
-    { name: "Kira", amount: 0 },
-    { name: "Elektrik", amount: 0 }
-  ],
-  sales: [
-    { date: new Date().toISOString().slice(0,10), portionQty: 0, qty500g: 0, qty1kg: 0 }
-  ]
-};
-
-const safeClone = typeof structuredClone === "function"
-  ? structuredClone
-  : (obj) => JSON.parse(JSON.stringify(obj));
-
-let state = safeClone(DEFAULT_STATE);
-
-const currency = (value) => {
-  if (!Number.isFinite(value)) return "-";
-  return new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value) + " TL";
-};
-
-const number = (value) => {
-  const parsed = parseFloat(String(value).replace(",", "."));
-  return Number.isFinite(parsed) ? parsed : 0;
-};
-
-const setStatus = (text, tone = "accent") => {
-  const pill = document.getElementById("statusPill");
-  pill.textContent = text;
-  pill.style.borderColor = tone === "danger" ? "rgba(255,107,129,.5)" : "rgba(50,245,199,.5)";
-  pill.style.color = tone === "danger" ? "var(--danger)" : "var(--muted)";
-};
-
-const updateStorage = () => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-};
-
-const getDaysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
-
-const syncSettingsToUI = () => {
-  document.getElementById("profitPortion").value = state.settings.portionProfit;
-  document.getElementById("profit500").value = state.settings.profit500g;
-  document.getElementById("profit1kg").value = state.settings.profit1kg;
-  document.getElementById("monthSelect").value = String(state.settings.month);
-  document.getElementById("yearSelect").value = String(state.settings.year);
-  document.getElementById("daysInMonth").value = state.settings.daysInMonth;
-  document.getElementById("autoDays").checked = state.settings.autoDays;
-  document.getElementById("allocateToggle").checked = state.settings.allocateOnlyEnteredDays;
-};
-
-const syncSettingsFromUI = () => {
-  state.settings.portionProfit = number(document.getElementById("profitPortion").value);
-  state.settings.profit500g = number(document.getElementById("profit500").value);
-  state.settings.profit1kg = number(document.getElementById("profit1kg").value);
-  state.settings.month = parseInt(document.getElementById("monthSelect").value, 10);
-  state.settings.year = parseInt(document.getElementById("yearSelect").value, 10);
-  state.settings.daysInMonth = Math.max(1, parseInt(document.getElementById("daysInMonth").value, 10) || 1);
-  state.settings.autoDays = document.getElementById("autoDays").checked;
-  state.settings.allocateOnlyEnteredDays = document.getElementById("allocateToggle").checked;
-};
-
-const renderMonthYear = () => {
-  const monthSelect = document.getElementById("monthSelect");
-  const yearSelect = document.getElementById("yearSelect");
-
-  const months = [
-    "Ocak","Şubat","Mart","Nisan","Mayıs","Haziran",
-    "Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"
-  ];
-  monthSelect.innerHTML = months.map((name, idx) => `<option value="${idx}">${name}</option>`).join("");
-
-  const yearStart = new Date().getFullYear() - 3;
-  const yearEnd = new Date().getFullYear() + 3;
-  const years = [];
-  for (let year = yearStart; year <= yearEnd; year += 1) years.push(year);
-  yearSelect.innerHTML = years.map((year) => `<option value="${year}">${year}</option>`).join("");
-};
-
-const renderExpenses = () => {
-  const tbody = document.querySelector("#expenseTable tbody");
-  tbody.innerHTML = state.expenses.map((expense, index) => `
-    <tr>
-      <td><input type="text" data-expense-name="${index}" value="${expense.name}" /></td>
-      <td class="right"><input type="number" step="1" data-expense-amount="${index}" value="${expense.amount}" /></td>
-      <td class="center"><button class="danger" data-expense-remove="${index}">Sil</button></td>
-    </tr>
-  `).join("");
-
-  tbody.querySelectorAll("input[data-expense-name]").forEach((input) => {
-    input.addEventListener("input", (event) => {
-      const idx = parseInt(event.target.dataset.expenseName, 10);
-      state.expenses[idx].name = event.target.value;
-      updateAll();
-    });
-  });
-  tbody.querySelectorAll("input[data-expense-amount]").forEach((input) => {
-    input.addEventListener("input", (event) => {
-      const idx = parseInt(event.target.dataset.expenseAmount, 10);
-      state.expenses[idx].amount = Math.max(0, number(event.target.value));
-      updateAll();
-    });
-  });
-  tbody.querySelectorAll("button[data-expense-remove]").forEach((btn) => {
-    btn.addEventListener("click", (event) => {
-      const idx = parseInt(event.target.dataset.expenseRemove, 10);
-      state.expenses.splice(idx, 1);
-      renderExpenses();
-      updateAll();
-    });
-  });
-};
-
-const renderSales = () => {
-  const tbody = document.querySelector("#salesTable tbody");
-  tbody.innerHTML = state.sales.map((sale, index) => {
-    const gross = sale.portionQty * state.settings.portionProfit
-      + sale.qty500g * state.settings.profit500g
-      + sale.qty1kg * state.settings.profit1kg;
-    const dailyFixed = getDailyFixedExpense();
-    const real = gross - dailyFixed;
-
-    return `
-      <tr>
-        <td><input type="date" data-sale-date="${index}" value="${sale.date}" /></td>
-        <td class="right"><input type="number" step="1" data-sale-portion="${index}" value="${sale.portionQty}" /></td>
-        <td class="right"><input type="number" step="1" data-sale-500="${index}" value="${sale.qty500g}" /></td>
-        <td class="right"><input type="number" step="1" data-sale-1kg="${index}" value="${sale.qty1kg}" /></td>
-        <td class="right">${currency(gross)}</td>
-        <td class="right">${currency(real)}</td>
-        <td class="center"><button class="danger" data-sale-remove="${index}">Sil</button></td>
-      </tr>
-    `;
-  }).join("");
-
-  tbody.querySelectorAll("input[data-sale-date]").forEach((input) => {
-    input.addEventListener("input", (event) => {
-      const idx = parseInt(event.target.dataset.saleDate, 10);
-      state.sales[idx].date = event.target.value;
-      updateAll();
-    });
-  });
-  tbody.querySelectorAll("input[data-sale-portion]").forEach((input) => {
-    input.addEventListener("input", (event) => {
-      const idx = parseInt(event.target.dataset.salePortion, 10);
-      state.sales[idx].portionQty = Math.max(0, Math.round(number(event.target.value)));
-      updateAll();
-    });
-  });
-  tbody.querySelectorAll("input[data-sale-500]").forEach((input) => {
-    input.addEventListener("input", (event) => {
-      const idx = parseInt(event.target.dataset.sale500, 10);
-      state.sales[idx].qty500g = Math.max(0, Math.round(number(event.target.value)));
-      updateAll();
-    });
-  });
-  tbody.querySelectorAll("input[data-sale-1kg]").forEach((input) => {
-    input.addEventListener("input", (event) => {
-      const idx = parseInt(event.target.dataset.sale1kg, 10);
-      state.sales[idx].qty1kg = Math.max(0, Math.round(number(event.target.value)));
-      updateAll();
-    });
-  });
-  tbody.querySelectorAll("button[data-sale-remove]").forEach((btn) => {
-    btn.addEventListener("click", (event) => {
-      const idx = parseInt(event.target.dataset.saleRemove, 10);
-      state.sales.splice(idx, 1);
-      renderSales();
-      updateAll();
-    });
-  });
-};
-
-const getTotalMonthlyFixed = () => state.expenses.reduce((sum, item) => sum + number(item.amount), 0);
-
-const getDailyFixedExpense = () => {
-  const days = state.settings.daysInMonth || 1;
-  return getTotalMonthlyFixed() / days;
-};
-
-const updateSummary = () => {
-  const totalGross = state.sales.reduce((sum, sale) => {
-    return sum + sale.portionQty * state.settings.portionProfit
-      + sale.qty500g * state.settings.profit500g
-      + sale.qty1kg * state.settings.profit1kg;
-  }, 0);
-
-  const enteredDays = state.sales.length;
-  const totalFixed = state.settings.allocateOnlyEnteredDays
-    ? getDailyFixedExpense() * enteredDays
-    : getTotalMonthlyFixed();
-
-  const totalReal = totalGross - totalFixed;
-
-  document.getElementById("totalGross").textContent = currency(totalGross);
-  document.getElementById("totalFixedAllocated").textContent = currency(totalFixed);
-  document.getElementById("totalReal").textContent = currency(totalReal);
-
-  document.getElementById("totalMonthlyFixed").textContent = currency(getTotalMonthlyFixed());
-  document.getElementById("dailyFixed").textContent = currency(getDailyFixedExpense());
-  document.getElementById("daysDisplay").textContent = String(state.settings.daysInMonth);
-};
-
-const updateAll = () => {
-  syncSettingsFromUI();
-  if (state.settings.autoDays) {
-    state.settings.daysInMonth = getDaysInMonth(state.settings.month, state.settings.year);
-    document.getElementById("daysInMonth").value = state.settings.daysInMonth;
-  }
-  renderSales();
-  updateSummary();
-  updateStorage();
-  setStatus("Durum: kaydedildi", "accent");
-};
-
-const exportData = () => {
-  const data = JSON.stringify(state, null, 2);
-  const blob = new Blob([data], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "daily-net-profit.json";
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
-};
-
-const importData = (file) => {
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    try {
-      const parsed = JSON.parse(event.target.result);
-      state = {
-        settings: { ...DEFAULT_STATE.settings, ...(parsed.settings || {}) },
-        expenses: Array.isArray(parsed.expenses) ? parsed.expenses : safeClone(DEFAULT_STATE.expenses),
-        sales: Array.isArray(parsed.sales) ? parsed.sales : safeClone(DEFAULT_STATE.sales)
-      };
-      syncSettingsToUI();
-      renderExpenses();
-      renderSales();
-      updateSummary();
-      updateStorage();
-      setStatus("Durum: içe aktarıldı", "accent");
-    } catch (error) {
-      console.error(error);
-      setStatus("Durum: içe aktarma hatası", "danger");
-    }
-  };
-  reader.readAsText(file);
-};
-
-const resetData = () => {
-  state = safeClone(DEFAULT_STATE);
-  syncSettingsToUI();
-  renderExpenses();
-  renderSales();
-  updateSummary();
-  updateStorage();
-  setStatus("Durum: sıfırlandı", "accent");
-};
-
-const loadStorage = () => {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return;
-  try {
-    const parsed = JSON.parse(raw);
-    state = {
-      settings: { ...DEFAULT_STATE.settings, ...(parsed.settings || {}) },
-      expenses: Array.isArray(parsed.expenses) ? parsed.expenses : safeClone(DEFAULT_STATE.expenses),
-      sales: Array.isArray(parsed.sales) ? parsed.sales : safeClone(DEFAULT_STATE.sales)
-    };
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const initEvents = () => {
-  document.getElementById("profitPortion").addEventListener("input", updateAll);
-  document.getElementById("profit500").addEventListener("input", updateAll);
-  document.getElementById("profit1kg").addEventListener("input", updateAll);
-  document.getElementById("monthSelect").addEventListener("change", updateAll);
-  document.getElementById("yearSelect").addEventListener("change", updateAll);
-  document.getElementById("daysInMonth").addEventListener("input", updateAll);
-  document.getElementById("autoDays").addEventListener("change", updateAll);
-  document.getElementById("allocateToggle").addEventListener("change", updateAll);
-
-  document.getElementById("addExpense").addEventListener("click", () => {
-    state.expenses.push({ name: "Yeni Gider", amount: 0 });
-    renderExpenses();
-    updateAll();
-  });
-
-  document.getElementById("addSale").addEventListener("click", () => {
-    state.sales.push({ date: new Date().toISOString().slice(0,10), portionQty: 0, qty500g: 0, qty1kg: 0 });
-    renderSales();
-    updateAll();
-  });
-
-  document.getElementById("exportBtn").addEventListener("click", exportData);
-  document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importFile").click());
-  document.getElementById("importFile").addEventListener("change", (event) => {
-    const file = event.target.files[0];
-    if (file) importData(file);
-    event.target.value = "";
-  });
-
-  document.getElementById("resetBtn").addEventListener("click", () => {
-    if (confirm("Tüm verileri sıfırlamak istediğine emin misin?")) {
-      resetData();
-    }
-  });
-};
-
-const init = () => {
-  renderMonthYear();
-  loadStorage();
-  if (state.settings.autoDays) {
-    state.settings.daysInMonth = getDaysInMonth(state.settings.month, state.settings.year);
-  }
-  syncSettingsToUI();
-  renderExpenses();
-  renderSales();
-  updateSummary();
-  initEvents();
-  updateStorage();
-};
-
-init();
-</script>
 </body>
 </html>
