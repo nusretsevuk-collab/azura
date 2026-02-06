@@ -6,35 +6,35 @@
 <title>Maliyet Uygulaması (Dinamik Salata + Dinamik Paketleme)</title>
 <style>
 :root{
-  --bg:#070b16;
-  --panel:#0f1b34;
-  --text:#f8fbff;
-  --muted:#c7d6f2;
-  --accent:#42f5b3;
+  --bg:#050a18;
+  --panel:#0d1a33;
+  --text:#f6f9ff;
+  --muted:#c2d0ea;
+  --accent:#2cf3b1;
   --warn:#ffd166;
-  --danger:#ff5d7a;
-  --line:rgba(255,255,255,.14);
-  --shadow:0 22px 52px rgba(0,0,0,.6);
+  --danger:#ff5f82;
+  --line:rgba(255,255,255,.18);
+  --shadow:0 24px 60px rgba(0,0,0,.7);
   --radius:16px;
-  --ring:0 0 0 3px rgba(66,245,179,.25);
+  --ring:0 0 0 3px rgba(44,243,177,.3);
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif
 }
 
 body{
   margin:0;
-  background:radial-gradient(1200px 800px at 18% 8%, #1b3f84 0%, var(--bg) 58%);
+  background:radial-gradient(1200px 800px at 18% 8%, #1c4290 0%, var(--bg) 58%);
   color:var(--text);
   line-height:1.5
 }
 
-header{padding:18px 20px;position:sticky;top:0;backdrop-filter:blur(12px);background:rgba(6,10,22,.86);border-bottom:1px solid rgba(255,255,255,.18);z-index:5}
+header{padding:18px 20px;position:sticky;top:0;backdrop-filter:blur(12px);background:rgba(5,9,20,.9);border-bottom:1px solid rgba(255,255,255,.2);z-index:5}
 header h1{font-size:17.5px;margin:0;font-weight:750;letter-spacing:.35px}
 header .sub{font-size:12.5px;color:var(--muted);margin-top:6px}
 main{padding:20px;display:grid;grid-template-columns:380px 1fr;gap:16px;align-items:start}
 @media (max-width:980px){main{grid-template-columns:1fr}}
 .card{
-  background:linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.03));
-  border:1px solid rgba(255,255,255,.26);
+  background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.32);
   border-radius:var(--radius);
   box-shadow:var(--shadow);
   overflow:hidden
@@ -48,48 +48,53 @@ label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:6px;font-w
 input, select, button{
   width:100%;
   box-sizing:border-box;
-  background:rgba(4,8,18,.72);
-  border:1px solid rgba(255,255,255,.26);
+  background:rgba(4,8,18,.78);
+  border:1px solid rgba(255,255,255,.3);
   border-radius:12px;
   color:var(--text);
   padding:10px 12px;
   outline:none;
   transition:border-color .2s ease, box-shadow .2s ease, background .2s ease, transform .2s ease
 }
-input:focus,select:focus{border-color:rgba(66,245,179,.75);box-shadow:var(--ring);background:rgba(7,12,24,.86)}
-input:hover,select:hover{border-color:rgba(255,255,255,.34)}
-button{cursor:pointer;font-weight:700;background:rgba(66,245,179,.28);border-color:rgba(66,245,179,.55);box-shadow:0 14px 22px rgba(0,0,0,.42)}
-button:hover{background:rgba(66,245,179,.38);transform:translateY(-1px)}
+input:focus,select:focus{border-color:rgba(44,243,177,.8);box-shadow:var(--ring);background:rgba(7,12,24,.9)}
+input:hover,select:hover{border-color:rgba(255,255,255,.4)}
+button{cursor:pointer;font-weight:700;background:rgba(44,243,177,.32);border-color:rgba(44,243,177,.6);box-shadow:0 14px 24px rgba(0,0,0,.45)}
+button:hover{background:rgba(44,243,177,.45);transform:translateY(-1px)}
 button:focus{box-shadow:var(--ring)}
-.btn2{background:rgba(251,191,36,.2);border-color:rgba(251,191,36,.5)}
-.btn2:hover{background:rgba(251,191,36,.32)}
-.btndanger{background:rgba(251,113,133,.2);border-color:rgba(251,113,133,.5)}
-.btndanger:hover{background:rgba(251,113,133,.32)}
+.btn2{background:rgba(255,209,102,.22);border-color:rgba(255,209,102,.55)}
+.btn2:hover{background:rgba(255,209,102,.36)}
+.btndanger{background:rgba(255,95,130,.22);border-color:rgba(255,95,130,.55)}
+.btndanger:hover{background:rgba(255,95,130,.36)}
 .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 @media (max-width:980px){.kpi{grid-template-columns:repeat(2,1fr)}}
 .k{
-  background:rgba(5,9,18,.72);
-  border:1px solid rgba(255,255,255,.24);
+  background:rgba(6,12,24,.78);
+  border:1px solid rgba(255,255,255,.28);
   border-radius:14px;
   padding:12px
 }
 .k .t{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-.k .v{margin-top:8px;font-size:19px;font-weight:800}
+.k .v{margin-top:8px;font-size:20px;font-weight:800}
 .k .v.warn{color:var(--warn)}
 .k .v.acc{color:var(--accent)}
 .k .v.dng{color:var(--danger)}
 table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.16);text-align:left}
+th,td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.2);text-align:left}
 th{
-  color:#d8e7ff;
+  color:#e1edff;
   font-weight:800;
   font-size:10.5px;
   text-transform:uppercase;
   letter-spacing:.08em;
-  background:rgba(2,7,16,.85)
+  background:rgba(3,8,18,.92)
 }
+th:first-child,
+th:nth-child(2){
+  color:var(--warn);
+}
+th.section{background:rgba(5,12,26,.98);color:var(--accent);font-size:10px}
 tbody tr:nth-child(even) td{background:rgba(255,255,255,.015)}
-tr:hover td{background:rgba(255,255,255,.08)}
+tr:hover td{background:rgba(255,255,255,.1)}
 .mini{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.45}
 .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid rgba(255,255,255,.24);border-radius:999px;background:rgba(5,10,20,.7);font-size:11px;color:var(--muted)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -185,6 +190,9 @@ tr:hover td{background:rgba(255,255,255,.08)}
         <div class="hd"><h2>Paketleme Reçetesi (adet)</h2><span class="pill">Boy bazlı</span></div>
         <div class="bd tight">
           <table id="tblPack"></table>
+          <div class="row" style="margin-top:10px;">
+            <div class="col"><button id="addPackExtra">+ Kalem ekle</button></div>
+          </div>
           <div class="mini">Porsiyon/500g ve 1kg için paketleme adetlerini düzenleyebilirsin.</div>
         </div>
       </section>
@@ -237,24 +245,25 @@ const DEFAULT = {
     "500 g":{"Lavaş":0.5,"Pilav paketi (120 g)":1,"Sızdırmaz kap":1,"Köpük tabak":2,"6'lı servis set":1,"Poşet":1},
     "1 kg":{"Lavaş":1,"Pilav paketi (120 g)":2,"Sızdırmaz kap":2,"Köpük tabak":2,"6'lı servis set":1,"Poşet":1}
   },
+  packExtras:[],
   recipes:[
-    {urun:"Karışık",boy:"Porsiyon",Bonfile:70,Pirzola:130,Kanat:80,"Köfte":70,Marul:30,Domates:30,"Soğan":30},
-    {urun:"Bonfile",boy:"Porsiyon",Bonfile:300,Pirzola:0,Kanat:0,"Köfte":0,Marul:30,Domates:30,"Soğan":30},
-    {urun:"Pirzola",boy:"Porsiyon",Bonfile:0,Pirzola:300,Kanat:0,"Köfte":0,Marul:30,Domates:30,"Soğan":30},
-    {urun:"Kanat",boy:"Porsiyon",Bonfile:0,Pirzola:0,Kanat:300,"Köfte":0,Marul:30,Domates:30,"Soğan":30},
-    {urun:"Köfte",boy:"Porsiyon",Bonfile:0,Pirzola:0,Kanat:0,"Köfte":210,Marul:30,Domates:30,"Soğan":30},
+    {urun:"Karışık",boy:"Porsiyon",Bonfile:70,Pirzola:130,Kanat:80,"Köfte":70,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
+    {urun:"Bonfile",boy:"Porsiyon",Bonfile:300,Pirzola:0,Kanat:0,"Köfte":0,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
+    {urun:"Pirzola",boy:"Porsiyon",Bonfile:0,Pirzola:300,Kanat:0,"Köfte":0,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
+    {urun:"Kanat",boy:"Porsiyon",Bonfile:0,Pirzola:0,Kanat:300,"Köfte":0,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
+    {urun:"Köfte",boy:"Porsiyon",Bonfile:0,Pirzola:0,Kanat:0,"Köfte":210,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
 
-    {urun:"Karışık",boy:"500 g",Bonfile:100,Pirzola:186,Kanat:114,"Köfte":100,Marul:30,Domates:30,"Soğan":30},
-    {urun:"Bonfile",boy:"500 g",Bonfile:500,Pirzola:0,Kanat:0,"Köfte":0,Marul:30,Domates:30,"Soğan":30},
-    {urun:"Pirzola",boy:"500 g",Bonfile:0,Pirzola:500,Kanat:0,"Köfte":0,Marul:30,Domates:30,"Soğan":30},
-    {urun:"Kanat",boy:"500 g",Bonfile:0,Pirzola:0,Kanat:500,"Köfte":0,Marul:30,Domates:30,"Soğan":30},
-    {urun:"Köfte",boy:"500 g",Bonfile:0,Pirzola:0,Kanat:0,"Köfte":500,Marul:30,Domates:30,"Soğan":30},
+    {urun:"Karışık",boy:"500 g",Bonfile:100,Pirzola:186,Kanat:114,"Köfte":100,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
+    {urun:"Bonfile",boy:"500 g",Bonfile:500,Pirzola:0,Kanat:0,"Köfte":0,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
+    {urun:"Pirzola",boy:"500 g",Bonfile:0,Pirzola:500,Kanat:0,"Köfte":0,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
+    {urun:"Kanat",boy:"500 g",Bonfile:0,Pirzola:0,Kanat:500,"Köfte":0,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
+    {urun:"Köfte",boy:"500 g",Bonfile:0,Pirzola:0,Kanat:0,"Köfte":500,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
 
-    {urun:"Karışık",boy:"1 kg",Bonfile:200,Pirzola:371,Kanat:229,"Köfte":200,Marul:60,Domates:60,"Soğan":60},
-    {urun:"Bonfile",boy:"1 kg",Bonfile:1000,Pirzola:0,Kanat:0,"Köfte":0,Marul:60,Domates:60,"Soğan":60},
-    {urun:"Pirzola",boy:"1 kg",Bonfile:0,Pirzola:1000,Kanat:0,"Köfte":0,Marul:60,Domates:60,"Soğan":60},
-    {urun:"Kanat",boy:"1 kg",Bonfile:0,Pirzola:0,Kanat:1000,"Köfte":0,Marul:60,Domates:60,"Soğan":60},
-    {urun:"Köfte",boy:"1 kg",Bonfile:0,Pirzola:0,Kanat:0,"Köfte":1000,Marul:60,Domates:60,"Soğan":60}
+    {urun:"Karışık",boy:"1 kg",Bonfile:200,Pirzola:371,Kanat:229,"Köfte":200,Marul:60,Domates:60,"Soğan":60,Ekmek:0,Ayran:0},
+    {urun:"Bonfile",boy:"1 kg",Bonfile:1000,Pirzola:0,Kanat:0,"Köfte":0,Marul:60,Domates:60,"Soğan":60,Ekmek:0,Ayran:0},
+    {urun:"Pirzola",boy:"1 kg",Bonfile:0,Pirzola:1000,Kanat:0,"Köfte":0,Marul:60,Domates:60,"Soğan":60,Ekmek:0,Ayran:0},
+    {urun:"Kanat",boy:"1 kg",Bonfile:0,Pirzola:0,Kanat:1000,"Köfte":0,Marul:60,Domates:60,"Soğan":60,Ekmek:0,Ayran:0},
+    {urun:"Köfte",boy:"1 kg",Bonfile:0,Pirzola:0,Kanat:0,"Köfte":1000,Marul:60,Domates:60,"Soğan":60,Ekmek:0,Ayran:0}
   ]
 };
 const LS_KEY="maliyet_app_v2_dynamic_pack";
@@ -293,13 +302,21 @@ function costPack(boy,adet=1,ayran=0,ekmek=0){
   const p=STATE.prices, pack=STATE.packBySize[boy];
   let s=0;
   for(const k of Object.keys(pack)) s+=(pack[k]||0)*(p[k]?.price??0);
+  for(const extra of STATE.packExtras){
+    if(!extra) continue;
+    const qty=extra.qty||0;
+    const price=p[extra.item]?.price??0;
+    s+=qty*price;
+  }
   s+=(ayran||0)*p["Ayran"].price;
   s+=(ekmek||0)*p["Ekmek"].price;
   return s*adet;
 }
 function totalCost(urun,boy,adet=1,ayran=0,ekmek=0){
   const r=getRecipe(urun,boy); if(!r) return {et:0,salata:0,pack:0,total:0};
-  const et=costMeat(r)*adet, salata=costSalad(r)*adet, pack=costPack(boy,adet,ayran,ekmek);
+  const p=STATE.prices;
+  const extraPerItem=(r.Ekmek||0)*(p["Ekmek"]?.price??0)+(r.Ayran||0)*(p["Ayran"]?.price??0);
+  const et=costMeat(r)*adet, salata=costSalad(r)*adet, pack=costPack(boy,adet,ayran,ekmek)+(extraPerItem*adet);
   return {et,salata,pack,total:et+salata+pack};
 }
 function targetForSize(boy){return boy==="1 kg"?num(document.getElementById("targetKg").value):num(document.getElementById("targetSmall").value)}
@@ -320,7 +337,7 @@ function renderPrices(){
   tbl.innerHTML=`<thead><tr><th>Kalem</th><th>Birim</th><th class="right">Birim Fiyat (TL)</th></tr></thead>
   <tbody>${rows.map(([k,v])=>`<tr><td>${k}</td><td class="muted">${v.unit}</td><td class="right"><input data-price="${k}" type="number" step="0.01" value="${v.price}"></td></tr>`).join("")}</tbody>`;
   tbl.querySelectorAll("input[data-price]").forEach(inp=>{
-    inp.addEventListener("input",e=>{const key=e.target.getAttribute("data-price"); STATE.prices[key].price=num(e.target.value); refreshQuick();});
+    inp.addEventListener("input",e=>{const key=e.target.getAttribute("data-price"); STATE.prices[key].price=num(e.target.value); renderPack(); refreshQuick();});
   });
 }
 function renderPack(){
@@ -328,16 +345,68 @@ function renderPack(){
   const items=Object.keys(STATE.packBySize["Porsiyon"]);
   const sizes=Object.keys(STATE.packBySize);
   tbl.innerHTML=`<thead><tr><th>Kalem</th>${sizes.map(s=>`<th class="right">${s}</th>`).join("")}</tr></thead>
-  <tbody>${items.map(it=>`<tr><td>${it}</td>${sizes.map(s=>`<td class="right"><input data-pack="${it}" data-size="${s}" type="number" step="0.1" value="${STATE.packBySize[s][it]??0}"></td>`).join("")}</tr>`).join("")}</tbody>`;
+  <tbody>${items.map(it=>`<tr><td>${it}</td>${sizes.map(s=>`<td class="right"><input data-pack="${it}" data-size="${s}" type="number" step="0.1" value="${STATE.packBySize[s][it]??0}"></td>`).join("")}</tr>`).join("")}
+    <tr><th class="section" colspan="${sizes.length + 1}">Ek Paketleme Kalemleri</th></tr>
+    ${STATE.packExtras.map((row,idx)=>{
+      const item=row?.item||"";
+      const qty=row?.qty??0;
+      const price=STATE.prices[item]?.price??0;
+      const cost=qty*price;
+      return `<tr>
+        <td>
+          <select data-pack-extra-item="${idx}">
+            <option value="">Kalem seç</option>
+            ${Object.keys(STATE.prices).map(key=>`<option value="${key}" ${key===item?"selected":""}>${key}</option>`).join("")}
+          </select>
+        </td>
+        <td class="right"><input data-pack-extra-qty="${idx}" type="number" step="1" min="0" value="${qty}"></td>
+        <td class="right">${fmt(cost)}</td>
+        <td class="right"><button class="btndanger" data-pack-extra-remove="${idx}">Sil</button></td>
+      </tr>`;
+    }).join("")}
+  </tbody>`;
   tbl.querySelectorAll("input[data-pack]").forEach(inp=>{
     inp.addEventListener("input",e=>{const it=e.target.getAttribute("data-pack"); const s=e.target.getAttribute("data-size"); STATE.packBySize[s][it]=num(e.target.value); refreshQuick();});
+  });
+  tbl.querySelectorAll("select[data-pack-extra-item]").forEach(sel=>{
+    sel.addEventListener("change",e=>{
+      const idx=parseInt(e.target.getAttribute("data-pack-extra-item"),10);
+      STATE.packExtras[idx].item=e.target.value;
+      renderPack();refreshQuick();
+    });
+  });
+  tbl.querySelectorAll("input[data-pack-extra-qty]").forEach(inp=>{
+    inp.addEventListener("input",e=>{
+      const idx=parseInt(e.target.getAttribute("data-pack-extra-qty"),10);
+      STATE.packExtras[idx].qty=Math.max(0,Math.round(num(e.target.value)));
+      renderPack();refreshQuick();
+    });
+  });
+  tbl.querySelectorAll("button[data-pack-extra-remove]").forEach(btn=>{
+    btn.addEventListener("click",e=>{
+      const idx=parseInt(e.target.getAttribute("data-pack-extra-remove"),10);
+      STATE.packExtras.splice(idx,1);
+      renderPack();refreshQuick();
+    });
   });
 }
 function renderRecipes(){
   const tbl=document.getElementById("tblRec");
   const cols=["Bonfile","Pirzola","Kanat","Köfte","Marul","Domates","Soğan"];
-  tbl.innerHTML=`<thead><tr><th>Ürün</th><th>Boy</th>${cols.map(c=>`<th class="right">${c} (g)</th>`).join("")}</tr></thead>
-  <tbody>${STATE.recipes.map((r,idx)=>`<tr><td>${r.urun}</td><td class="muted">${r.boy}</td>${cols.map(c=>`<td class="right"><input data-rec="${idx}" data-col="${c}" type="number" step="1" value="${r[c]}"></td>`).join("")}</tr>`).join("")}</tbody>`;
+  const extras=["Ekmek","Ayran"];
+  tbl.innerHTML=`<thead>
+    <tr>
+      <th rowspan="2">Ürün</th>
+      <th rowspan="2">Boy</th>
+      <th class="section" colspan="${cols.length}">Et + Salata</th>
+      <th class="section" colspan="${extras.length}">Ekstralar</th>
+    </tr>
+    <tr>
+      ${cols.map(c=>`<th class="right">${c} (g)</th>`).join("")}
+      ${extras.map(c=>`<th class="right">${c} (adet)</th>`).join("")}
+    </tr>
+  </thead>
+  <tbody>${STATE.recipes.map((r,idx)=>`<tr><td>${r.urun}</td><td class="muted">${r.boy}</td>${cols.map(c=>`<td class="right"><input data-rec="${idx}" data-col="${c}" type="number" step="1" value="${r[c]}"></td>`).join("")}${extras.map(c=>`<td class="right"><input data-rec="${idx}" data-col="${c}" type="number" step="1" min="0" value="${r[c]??0}"></td>`).join("")}</tr>`).join("")}</tbody>`;
   tbl.querySelectorAll("input[data-rec]").forEach(inp=>{
     inp.addEventListener("input",e=>{const idx=parseInt(e.target.getAttribute("data-rec"),10); const col=e.target.getAttribute("data-col"); STATE.recipes[idx][col]=Math.max(0,Math.round(num(e.target.value))); refreshQuick();});
   });
@@ -413,7 +482,12 @@ function load(){
     STATE.params=Object.assign({},DEFAULT.params,STATE.params||{});
     STATE.prices=Object.assign({},DEFAULT.prices,STATE.prices||{});
     STATE.packBySize=Object.assign({},DEFAULT.packBySize,STATE.packBySize||{});
-    STATE.recipes=Array.isArray(STATE.recipes)?STATE.recipes:safeClone(DEFAULT.recipes);
+    STATE.packExtras=Array.isArray(STATE.packExtras)
+      ? STATE.packExtras.map(r=>({item:r?.item||"",qty:Math.max(0,Math.round(num(r?.qty)))}))
+      : safeClone(DEFAULT.packExtras);
+    STATE.recipes=Array.isArray(STATE.recipes)
+      ? STATE.recipes.map(r=>({...r,Ekmek:r.Ekmek??0,Ayran:r.Ayran??0}))
+      : safeClone(DEFAULT.recipes);
     pushParamsToUI();
     renderAllUI();
     setPill("Durum: yüklendi ✅","ok");
@@ -444,6 +518,10 @@ document.getElementById("saveBtn").addEventListener("click",save);
 document.getElementById("loadBtn").addEventListener("click",load);
 document.getElementById("resetBtn").addEventListener("click",()=>{ if(confirm("Ekranı varsayılana döndüreyim mi?")) resetAll(); });
 document.getElementById("refreshAll").addEventListener("click",()=>{renderAll(); setPill("Özet yenilendi","ok");});
+document.getElementById("addPackExtra").addEventListener("click",()=>{
+  STATE.packExtras.push({item:"",qty:0});
+  renderPack();refreshQuick();
+});
 
 pushParamsToUI();
 renderAllUI();
