@@ -1,531 +1,723 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Maliyet Uygulaması (Dinamik Salata + Dinamik Paketleme)</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Günlük Net Kâr Takibi</title>
 <style>
 :root{
-  --bg:#050a18;
-  --panel:#0d1a33;
-  --text:#f6f9ff;
-  --muted:#c2d0ea;
-  --accent:#2cf3b1;
-  --warn:#ffd166;
-  --danger:#ff5f82;
-  --line:rgba(255,255,255,.18);
-  --shadow:0 24px 60px rgba(0,0,0,.7);
+  --bg:#05070f;
+  --panel:#0e162b;
+  --panel-2:#111e38;
+  --text:#f3f6ff;
+  --muted:#b4c0dd;
+  --accent:#32f5c7;
+  --accent-2:#6aa9ff;
+  --danger:#ff6b81;
+  --warning:#f6c453;
+  --line:rgba(255,255,255,.12);
+  --shadow:0 20px 50px rgba(0,0,0,.45);
   --radius:16px;
-  --ring:0 0 0 3px rgba(44,243,177,.3);
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif
+  font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 }
 
+*{box-sizing:border-box}
 body{
   margin:0;
-  background:radial-gradient(1200px 800px at 18% 8%, #1c4290 0%, var(--bg) 58%);
+  background:radial-gradient(1200px 800px at 15% 5%, #1b2d5f 0%, var(--bg) 55%);
   color:var(--text);
-  line-height:1.5
+  line-height:1.5;
 }
 
-header{padding:18px 20px;position:sticky;top:0;backdrop-filter:blur(12px);background:rgba(5,9,20,.9);border-bottom:1px solid rgba(255,255,255,.2);z-index:5}
-header h1{font-size:17.5px;margin:0;font-weight:750;letter-spacing:.35px}
-header .sub{font-size:12.5px;color:var(--muted);margin-top:6px}
-main{padding:20px;display:grid;grid-template-columns:380px 1fr;gap:16px;align-items:start}
-@media (max-width:980px){main{grid-template-columns:1fr}}
+.nav-link{
+  position:fixed;
+  top:16px;
+  right:20px;
+  z-index:12;
+  text-decoration:none;
+  color:var(--text);
+  font-size:12.5px;
+  font-weight:700;
+  padding:8px 14px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(7,12,22,.9);
+  transition:.2s ease;
+}
+
+.nav-link:hover,
+.nav-link:focus-visible{
+  border-color:rgba(50,245,199,.6);
+  color:var(--accent);
+  outline:none;
+}
+
+header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  padding:18px 24px;
+  background:rgba(5,8,16,.88);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+header h1{
+  margin:0;
+  font-size:18px;
+  letter-spacing:.4px;
+  font-weight:750;
+}
+header p{
+  margin:6px 0 0;
+  color:var(--muted);
+  font-size:12.5px;
+}
+
+main{
+  padding:24px;
+  display:grid;
+  grid-template-columns:360px 1fr;
+  gap:18px;
+}
+
+@media (max-width:1100px){
+  main{grid-template-columns:1fr}
+}
+
 .card{
-  background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.02));
-  border:1px solid rgba(255,255,255,.32);
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+  border:1px solid var(--line);
   border-radius:var(--radius);
   box-shadow:var(--shadow);
-  overflow:hidden
+  overflow:hidden;
 }
-.card .hd{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.24);display:flex;justify-content:space-between;align-items:center;gap:10px}
-.card .hd h2{margin:0;font-size:14.5px;font-weight:800;letter-spacing:.35px}
-.card .bd{padding:14px 16px}
+.card .hd{
+  padding:14px 16px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.card .hd h2{
+  margin:0;
+  font-size:14.5px;
+  font-weight:750;
+  letter-spacing:.3px;
+}
+.card .bd{padding:16px}
+
 .row{display:flex;gap:10px;flex-wrap:wrap}
-.col{flex:1 1 140px}
-label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:6px;font-weight:650;letter-spacing:.25px}
+.col{flex:1 1 150px}
+label{
+  display:block;
+  font-size:11px;
+  color:var(--muted);
+  margin-bottom:6px;
+  font-weight:600;
+  letter-spacing:.2px;
+}
+
 input, select, button{
   width:100%;
-  box-sizing:border-box;
-  background:rgba(4,8,18,.78);
-  border:1px solid rgba(255,255,255,.3);
-  border-radius:12px;
-  color:var(--text);
   padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.2);
+  background:rgba(4,8,18,.8);
+  color:var(--text);
   outline:none;
-  transition:border-color .2s ease, box-shadow .2s ease, background .2s ease, transform .2s ease
+  transition:.2s ease;
 }
-input:focus,select:focus{border-color:rgba(44,243,177,.8);box-shadow:var(--ring);background:rgba(7,12,24,.9)}
-input:hover,select:hover{border-color:rgba(255,255,255,.4)}
-button{cursor:pointer;font-weight:700;background:rgba(44,243,177,.32);border-color:rgba(44,243,177,.6);box-shadow:0 14px 24px rgba(0,0,0,.45)}
-button:hover{background:rgba(44,243,177,.45);transform:translateY(-1px)}
-button:focus{box-shadow:var(--ring)}
-.btn2{background:rgba(255,209,102,.22);border-color:rgba(255,209,102,.55)}
-.btn2:hover{background:rgba(255,209,102,.36)}
-.btndanger{background:rgba(255,95,130,.22);border-color:rgba(255,95,130,.55)}
-.btndanger:hover{background:rgba(255,95,130,.36)}
-.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-@media (max-width:980px){.kpi{grid-template-columns:repeat(2,1fr)}}
-.k{
-  background:rgba(6,12,24,.78);
-  border:1px solid rgba(255,255,255,.28);
+input:focus, select:focus{
+  border-color:rgba(50,245,199,.7);
+  box-shadow:0 0 0 3px rgba(50,245,199,.25);
+}
+button{
+  cursor:pointer;
+  font-weight:700;
+  background:rgba(50,245,199,.25);
+  border-color:rgba(50,245,199,.5);
+}
+button:hover{transform:translateY(-1px); background:rgba(50,245,199,.35)}
+button.secondary{background:rgba(106,169,255,.18); border-color:rgba(106,169,255,.5)}
+button.danger{background:rgba(255,107,129,.18); border-color:rgba(255,107,129,.5)}
+
+.pill{
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.2);
+  font-size:11px;
+  color:var(--muted);
+  background:rgba(7,12,22,.75);
+}
+
+.kpi{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+@media (max-width:900px){
+  .kpi{grid-template-columns:1fr}
+}
+
+.kpi .tile{
+  padding:12px;
   border-radius:14px;
-  padding:12px
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(6,10,20,.78);
 }
-.k .t{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-.k .v{margin-top:8px;font-size:20px;font-weight:800}
-.k .v.warn{color:var(--warn)}
-.k .v.acc{color:var(--accent)}
-.k .v.dng{color:var(--danger)}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.2);text-align:left}
-th{
-  color:#e1edff;
-  font-weight:800;
-  font-size:10.5px;
-  text-transform:uppercase;
+.kpi .tile .label{
+  font-size:10px;
+  color:var(--muted);
   letter-spacing:.08em;
-  background:rgba(3,8,18,.92)
+  text-transform:uppercase;
 }
-th:first-child,
-th:nth-child(2){
-  color:var(--warn);
+.kpi .tile .value{
+  margin-top:8px;
+  font-weight:800;
+  font-size:20px;
 }
-th.section{background:rgba(5,12,26,.98);color:var(--accent);font-size:10px}
-tbody tr:nth-child(even) td{background:rgba(255,255,255,.015)}
-tr:hover td{background:rgba(255,255,255,.1)}
-.mini{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.45}
-.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid rgba(255,255,255,.24);border-radius:999px;background:rgba(5,10,20,.7);font-size:11px;color:var(--muted)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media (max-width:980px){.grid2{grid-template-columns:1fr}}
-.tight input{padding:8px 10px;border-radius:10px}
+.value.accent{color:var(--accent)}
+.value.warning{color:var(--warning)}
+.value.danger{color:var(--danger)}
+
+.table-wrap{overflow:auto; border-radius:14px; border:1px solid var(--line)}
+
+table{width:100%; border-collapse:collapse; font-size:12px}
+th, td{padding:9px 8px; border-bottom:1px solid var(--line); text-align:left}
+th{
+  position:sticky;
+  top:0;
+  background:rgba(6,10,20,.95);
+  color:#d8e6ff;
+  text-transform:uppercase;
+  font-size:10px;
+  letter-spacing:.08em;
+}
+tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+tr:hover td{background:rgba(255,255,255,.08)}
 .right{text-align:right}
+.center{text-align:center}
 .muted{color:var(--muted)}
-.ok{color:var(--accent)}
-.warn{color:var(--warn)}
-.dng{color:var(--danger)}
+
+.toggle{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:rgba(7,12,22,.75);
+  padding:8px 10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.2);
+}
+.toggle input{width:auto}
+
+.helper{font-size:11.5px; color:var(--muted); margin-top:8px}
+
+.footer-actions{display:flex; gap:10px; flex-wrap:wrap}
 </style>
 </head>
 <body>
+<a class="nav-link" href="https://nusretsevuk-collab.github.io/maliyet-robotu/" target="_blank" rel="noopener noreferrer">📈 Günlük Sipariş Takip</a>
 <header>
-  <h1>Maliyet Uygulaması — Dinamik Salata + Dinamik Paketleme</h1>
-  <div class="sub">Sabit 20/29 gibi değerler yok. Her şey reçete + birim fiyatlarla hesaplanır. (Offline çalışır, Kaydet/Yükle ile hafızaya alır)</div>
+  <h1>Günlük Net Kâr Takibi</h1>
+  <p>Günlük satışlar, sabit giderler ve kâr hesapları tek sayfada. Tüm veriler otomatik kaydedilir.</p>
 </header>
 
 <main>
   <section class="card">
-    <div class="hd"><h2>Ayarlar</h2><span class="pill" id="statePill">Durum: hazır</span></div>
+    <div class="hd">
+      <h2>Ayarlar</h2>
+      <span class="pill" id="statusPill">Durum: hazır</span>
+    </div>
     <div class="bd">
       <div class="row">
-        <div class="col"><label>Komisyon % (c)</label><input id="c" type="number" step="0.1" value="10"></div>
-        <div class="col"><label>Satış KDV % (v)</label><input id="v" type="number" step="0.1" value="10"></div>
-        <div class="col"><label>Komisyon KDV %</label><input id="cv" type="number" step="0.1" value="18"></div>
+        <div class="col">
+          <label>PortionProfit (TL)</label>
+          <input id="profitPortion" type="number" step="1" value="140" />
+        </div>
+        <div class="col">
+          <label>Profit500g (TL)</label>
+          <input id="profit500" type="number" step="1" value="140" />
+        </div>
+        <div class="col">
+          <label>Profit1kg (TL)</label>
+          <input id="profit1kg" type="number" step="1" value="235" />
+        </div>
       </div>
 
-      <div class="row" style="margin-top:10px;">
-        <div class="col"><label>Net gelir katsayısı</label><input id="katsayi" type="number" step="0.001" value="0.791"></div>
-        <div class="col" style="display:flex; align-items:end;"><button id="calcK">Katsayıyı hesapla</button></div>
+      <div class="row" style="margin-top:12px;">
+        <div class="col">
+          <label>Ay</label>
+          <select id="monthSelect"></select>
+        </div>
+        <div class="col">
+          <label>Yıl</label>
+          <select id="yearSelect"></select>
+        </div>
+        <div class="col">
+          <label>DaysInMonth</label>
+          <input id="daysInMonth" type="number" min="1" max="31" step="1" />
+        </div>
       </div>
 
-      <div class="mini">Katsayı mantığı: <span class="muted">Etiket (KDV dahil)</span> × <span class="ok">katsayı</span> = <span class="muted">Net gelir</span> (platform kesintileri + KDV sonrası).<br/>Not: Senin tablondaki doğrulanmış değer: <b>0,791</b>.</div>
-
-      <hr style="border:0;border-top:1px solid var(--line); margin:14px 0;"/>
-
-      <div class="row">
-        <div class="col"><label>Hedef Net Kâr (Porsiyon / 500 g)</label><input id="targetSmall" type="number" step="1" value="135"></div>
-        <div class="col"><label>Hedef Net Kâr (1 kg)</label><input id="targetKg" type="number" step="1" value="220"></div>
+      <div class="row" style="margin-top:12px;">
+        <div class="col">
+          <label>Gün sayısını ay/yıla göre otomatik güncelle</label>
+          <div class="toggle">
+            <input id="autoDays" type="checkbox" checked />
+            <span class="muted">Aktif</span>
+          </div>
+        </div>
       </div>
 
-      <div class="row" style="margin-top:10px;">
-        <div class="col"><button id="saveBtn">Kaydet</button></div>
-        <div class="col"><button class="btn2" id="loadBtn">Yükle</button></div>
-        <div class="col"><button class="btndanger" id="resetBtn">Sıfırla</button></div>
-      </div>
+      <div class="helper">Ay veya yıl değiştiğinde gün sayısı otomatik güncellenir. İstersen DaysInMonth değerini manuel düzenleyebilirsin.</div>
 
-      <div class="mini">Kaydet/Yükle tarayıcı hafızasına (localStorage) yazar/okur.</div>
+      <div class="row" style="margin-top:14px;">
+        <div class="col"><button id="exportBtn" class="secondary">JSON Dışa Aktar</button></div>
+        <div class="col"><button id="importBtn" class="secondary">JSON İçe Aktar</button></div>
+        <div class="col"><button id="resetBtn" class="danger">Verileri Sıfırla</button></div>
+      </div>
+      <input id="importFile" type="file" accept="application/json" hidden />
     </div>
   </section>
 
-  <section style="display:grid; gap:14px;">
+  <section style="display:grid; gap:16px;">
     <section class="card">
-      <div class="hd"><h2>Hızlı Hesap</h2><div class="pill">Seç → maliyetleri gör → etiket fiyatını üret</div></div>
+      <div class="hd">
+        <h2>Aylık Sabit Giderler</h2>
+        <button id="addExpense" class="secondary">+ Satır</button>
+      </div>
       <div class="bd">
-        <div class="row">
-          <div class="col"><label>Ürün</label><select id="urunSel"></select></div>
-          <div class="col"><label>Boy</label><select id="boySel"></select></div>
-          <div class="col"><label>Adet</label><input id="adetSel" type="number" step="1" value="1" min="1"></div>
-          <div class="col"><label>Ekstra Ayran (adet)</label><input id="ayranSel" type="number" step="1" value="0" min="0"></div>
-          <div class="col"><label>Ekmek (adet)</label><input id="ekmekSel" type="number" step="1" value="1" min="0"></div>
+        <div class="table-wrap">
+          <table id="expenseTable">
+            <thead>
+              <tr>
+                <th>ExpenseName</th>
+                <th class="right">AmountTL</th>
+                <th class="center">Sil</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
-
         <div class="kpi" style="margin-top:12px;">
-          <div class="k"><div class="t">Et Maliyeti</div><div class="v" id="kEt">-</div></div>
-          <div class="k"><div class="t">Salata Maliyeti</div><div class="v" id="kSalata">-</div></div>
-          <div class="k"><div class="t">Paketleme Maliyeti</div><div class="v" id="kPack">-</div></div>
-          <div class="k"><div class="t">Toplam Maliyet</div><div class="v warn" id="kTop">-</div></div>
-        </div>
-
-        <div class="kpi" style="margin-top:10px;">
-          <div class="k"><div class="t">Hedef Net Kâr</div><div class="v acc" id="kHedef">-</div></div>
-          <div class="k"><div class="t">Önerilen Etiket (KDV dahil)</div><div class="v acc" id="kEtiket">-</div></div>
-          <div class="k"><div class="t">Net Gelir (Etiket×katsayı)</div><div class="v" id="kNetGelir">-</div></div>
-          <div class="k"><div class="t">Net Kâr</div><div class="v" id="kNetKar">-</div></div>
-        </div>
-
-        <div class="mini">Net kâr hesabı: <b>Net gelir = Etiket × katsayı</b> → <b>Net kâr = Net gelir - Toplam maliyet</b>.</div>
-      </div>
-    </section>
-
-    <section class="grid2">
-      <section class="card">
-        <div class="hd"><h2>Birim Fiyatlar</h2><span class="pill">kg ve adet</span></div>
-        <div class="bd tight">
-          <table id="tblPrices"></table>
-          <div class="mini">Birim fiyat değiştirince tüm hesaplar anında güncellenir.</div>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="hd"><h2>Paketleme Reçetesi (adet)</h2><span class="pill">Boy bazlı</span></div>
-        <div class="bd tight">
-          <table id="tblPack"></table>
-          <div class="row" style="margin-top:10px;">
-            <div class="col"><button id="addPackExtra">+ Kalem ekle</button></div>
+          <div class="tile">
+            <div class="label">TotalMonthlyFixedExpenses</div>
+            <div class="value warning" id="totalMonthlyFixed">0 TL</div>
           </div>
-          <div class="mini">Porsiyon/500g ve 1kg için paketleme adetlerini düzenleyebilirsin.</div>
-        </div>
-      </section>
-    </section>
-
-    <section class="card">
-      <div class="hd"><h2>Ürün Reçeteleri (gram)</h2><span class="pill">Et + Salata</span></div>
-      <div class="bd tight">
-        <div class="mini" style="margin-bottom:8px;">Her satır bir ürün+boy kombinasyonu. Gram değiştirince maliyet otomatik güncellenir.</div>
-        <div style="max-height:360px; overflow:auto; border:1px solid var(--line); border-radius:12px;">
-          <table id="tblRec"></table>
+          <div class="tile">
+            <div class="label">DaysInMonth</div>
+            <div class="value" id="daysDisplay">30</div>
+          </div>
+          <div class="tile">
+            <div class="label">DailyFixedExpense</div>
+            <div class="value accent" id="dailyFixed">0 TL</div>
+          </div>
         </div>
       </div>
     </section>
 
     <section class="card">
-      <div class="hd"><h2>Tüm Kombinasyonlar (Özet)</h2><div class="row" style="gap:8px; align-items:center;"><button id="refreshAll">Özeti Yenile</button></div></div>
+      <div class="hd">
+        <h2>Günlük Satış Girdileri</h2>
+        <button id="addSale" class="secondary">+ Gün</button>
+      </div>
       <div class="bd">
-        <div style="max-height:360px; overflow:auto; border:1px solid var(--line); border-radius:12px;">
-          <table id="tblAll"></table>
+        <div class="table-wrap">
+          <table id="salesTable">
+            <thead>
+              <tr>
+                <th>Tarih</th>
+                <th class="right">PortionQty</th>
+                <th class="right">Qty500g</th>
+                <th class="right">Qty1kg</th>
+                <th class="right">DailyGrossNet</th>
+                <th class="right">DailyRealNet</th>
+                <th class="center">Sil</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
-        <div class="mini">Bu tabloda adet=1, ayran=0, ekmek=1 varsayımıyla listeler.</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="hd">
+        <h2>Özet</h2>
+        <span class="pill">Anlık toplamlara göre güncellenir</span>
+      </div>
+      <div class="bd">
+        <div class="toggle" style="margin-bottom:12px;">
+          <input id="allocateToggle" type="checkbox" checked />
+          <span>Allocate fixed expenses only for entered days</span>
+        </div>
+        <div class="kpi">
+          <div class="tile">
+            <div class="label">TotalGrossNet</div>
+            <div class="value" id="totalGross">0 TL</div>
+          </div>
+          <div class="tile">
+            <div class="label">TotalFixedExpenseAllocated</div>
+            <div class="value warning" id="totalFixedAllocated">0 TL</div>
+          </div>
+          <div class="tile">
+            <div class="label">TotalRealNet</div>
+            <div class="value accent" id="totalReal">0 TL</div>
+          </div>
+        </div>
       </div>
     </section>
   </section>
 </main>
 
 <script>
-const DEFAULT = {
-  params:{c:10,v:10,cv:18,katsayi:0.791,targetSmall:135,targetKg:220},
-  prices:{
-    "Bonfile":{unit:"kg",price:138},
-    "Pirzola":{unit:"kg",price:100},
-    "Kanat":{unit:"kg",price:150},
-    "Köfte":{unit:"kg",price:300},
-    "Marul":{unit:"kg",price:85},
-    "Domates":{unit:"kg",price:59},
-    "Soğan":{unit:"kg",price:15},
-    "Lavaş":{unit:"adet",price:2},
-    "Pilav paketi (120 g)":{unit:"adet",price:2},
-    "Sızdırmaz kap":{unit:"adet",price:1.35},
-    "Köpük tabak":{unit:"adet",price:1.25},
-    "6'lı servis set":{unit:"adet",price:1.5},
-    "Poşet":{unit:"adet",price:0.5},
-    "Ayran":{unit:"adet",price:20},
-    "Ekmek":{unit:"adet",price:6}
+const STORAGE_KEY = "gunluk_net_kar_v1";
+const DEFAULT_STATE = {
+  settings: {
+    portionProfit: 140,
+    profit500g: 140,
+    profit1kg: 235,
+    month: new Date().getMonth(),
+    year: new Date().getFullYear(),
+    daysInMonth: 30,
+    autoDays: true,
+    allocateOnlyEnteredDays: true
   },
-  packBySize:{
-    "Porsiyon":{"Lavaş":0.5,"Pilav paketi (120 g)":1,"Sızdırmaz kap":1,"Köpük tabak":2,"6'lı servis set":1,"Poşet":1},
-    "500 g":{"Lavaş":0.5,"Pilav paketi (120 g)":1,"Sızdırmaz kap":1,"Köpük tabak":2,"6'lı servis set":1,"Poşet":1},
-    "1 kg":{"Lavaş":1,"Pilav paketi (120 g)":2,"Sızdırmaz kap":2,"Köpük tabak":2,"6'lı servis set":1,"Poşet":1}
-  },
-  packExtras:[],
-  recipes:[
-    {urun:"Karışık",boy:"Porsiyon",Bonfile:70,Pirzola:130,Kanat:80,"Köfte":70,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
-    {urun:"Bonfile",boy:"Porsiyon",Bonfile:300,Pirzola:0,Kanat:0,"Köfte":0,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
-    {urun:"Pirzola",boy:"Porsiyon",Bonfile:0,Pirzola:300,Kanat:0,"Köfte":0,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
-    {urun:"Kanat",boy:"Porsiyon",Bonfile:0,Pirzola:0,Kanat:300,"Köfte":0,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
-    {urun:"Köfte",boy:"Porsiyon",Bonfile:0,Pirzola:0,Kanat:0,"Köfte":210,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
-
-    {urun:"Karışık",boy:"500 g",Bonfile:100,Pirzola:186,Kanat:114,"Köfte":100,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
-    {urun:"Bonfile",boy:"500 g",Bonfile:500,Pirzola:0,Kanat:0,"Köfte":0,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
-    {urun:"Pirzola",boy:"500 g",Bonfile:0,Pirzola:500,Kanat:0,"Köfte":0,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
-    {urun:"Kanat",boy:"500 g",Bonfile:0,Pirzola:0,Kanat:500,"Köfte":0,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
-    {urun:"Köfte",boy:"500 g",Bonfile:0,Pirzola:0,Kanat:0,"Köfte":500,Marul:30,Domates:30,"Soğan":30,Ekmek:0,Ayran:0},
-
-    {urun:"Karışık",boy:"1 kg",Bonfile:200,Pirzola:371,Kanat:229,"Köfte":200,Marul:60,Domates:60,"Soğan":60,Ekmek:0,Ayran:0},
-    {urun:"Bonfile",boy:"1 kg",Bonfile:1000,Pirzola:0,Kanat:0,"Köfte":0,Marul:60,Domates:60,"Soğan":60,Ekmek:0,Ayran:0},
-    {urun:"Pirzola",boy:"1 kg",Bonfile:0,Pirzola:1000,Kanat:0,"Köfte":0,Marul:60,Domates:60,"Soğan":60,Ekmek:0,Ayran:0},
-    {urun:"Kanat",boy:"1 kg",Bonfile:0,Pirzola:0,Kanat:1000,"Köfte":0,Marul:60,Domates:60,"Soğan":60,Ekmek:0,Ayran:0},
-    {urun:"Köfte",boy:"1 kg",Bonfile:0,Pirzola:0,Kanat:0,"Köfte":1000,Marul:60,Domates:60,"Soğan":60,Ekmek:0,Ayran:0}
+  expenses: [
+    { name: "Kira", amount: 0 },
+    { name: "Elektrik", amount: 0 }
+  ],
+  sales: [
+    { date: new Date().toISOString().slice(0,10), portionQty: 0, qty500g: 0, qty1kg: 0 }
   ]
 };
-const LS_KEY="maliyet_app_v2_dynamic_pack";
+
 const safeClone = typeof structuredClone === "function"
   ? structuredClone
   : (obj) => JSON.parse(JSON.stringify(obj));
-let STATE=safeClone(DEFAULT);
 
-const fmt=n=>isFinite(n)?new Intl.NumberFormat("tr-TR",{minimumFractionDigits:2,maximumFractionDigits:2}).format(n)+" TL":"-";
-const fmt0=n=>isFinite(n)?new Intl.NumberFormat("tr-TR",{maximumFractionDigits:0}).format(n)+" TL":"-";
-const num=v=>{const x=parseFloat(String(v).replace(",", "."));return isFinite(x)?x:0};
+let state = safeClone(DEFAULT_STATE);
 
-function setPill(text,kind="ok"){
-  const el=document.getElementById("statePill");
-  el.textContent=text;
-  el.style.borderColor=kind==="dng"?"rgba(251,113,133,.5)":kind==="warn"?"rgba(251,191,36,.5)":"rgba(52,211,153,.45)";
-  el.style.color=kind==="dng"?"var(--danger)":kind==="warn"?"var(--warn)":"var(--muted)";
-}
+const currency = (value) => {
+  if (!Number.isFinite(value)) return "-";
+  return new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value) + " TL";
+};
 
-function computeKatsayi(cPct,vPct,cvPct){
-  const c=cPct/100,v=vPct/100,cv=cvPct/100;
-  const k=(1-v)*(1-c*(1+cv)); // yaklaşık
-  return Math.max(0,Math.min(1,k));
-}
+const number = (value) => {
+  const parsed = parseFloat(String(value).replace(",", "."));
+  return Number.isFinite(parsed) ? parsed : 0;
+};
 
-function getRecipe(urun,boy){return STATE.recipes.find(r=>r.urun===urun&&r.boy===boy)}
-function costMeat(r){
-  const p=STATE.prices;
-  return (r.Bonfile/1000)*p["Bonfile"].price+(r.Pirzola/1000)*p["Pirzola"].price+(r.Kanat/1000)*p["Kanat"].price+(r["Köfte"]/1000)*p["Köfte"].price;
-}
-function costSalad(r){
-  const p=STATE.prices;
-  return (r.Marul/1000)*p["Marul"].price+(r.Domates/1000)*p["Domates"].price+(r["Soğan"]/1000)*p["Soğan"].price;
-}
-function costPack(boy,adet=1,ayran=0,ekmek=0){
-  const p=STATE.prices, pack=STATE.packBySize[boy];
-  let s=0;
-  for(const k of Object.keys(pack)) s+=(pack[k]||0)*(p[k]?.price??0);
-  for(const extra of STATE.packExtras){
-    if(!extra) continue;
-    const qty=extra.qty||0;
-    const price=p[extra.item]?.price??0;
-    s+=qty*price;
+const setStatus = (text, tone = "accent") => {
+  const pill = document.getElementById("statusPill");
+  pill.textContent = text;
+  pill.style.borderColor = tone === "danger" ? "rgba(255,107,129,.5)" : "rgba(50,245,199,.5)";
+  pill.style.color = tone === "danger" ? "var(--danger)" : "var(--muted)";
+};
+
+const updateStorage = () => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+};
+
+const getDaysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
+
+const syncSettingsToUI = () => {
+  document.getElementById("profitPortion").value = state.settings.portionProfit;
+  document.getElementById("profit500").value = state.settings.profit500g;
+  document.getElementById("profit1kg").value = state.settings.profit1kg;
+  document.getElementById("monthSelect").value = String(state.settings.month);
+  document.getElementById("yearSelect").value = String(state.settings.year);
+  document.getElementById("daysInMonth").value = state.settings.daysInMonth;
+  document.getElementById("autoDays").checked = state.settings.autoDays;
+  document.getElementById("allocateToggle").checked = state.settings.allocateOnlyEnteredDays;
+};
+
+const syncSettingsFromUI = () => {
+  state.settings.portionProfit = number(document.getElementById("profitPortion").value);
+  state.settings.profit500g = number(document.getElementById("profit500").value);
+  state.settings.profit1kg = number(document.getElementById("profit1kg").value);
+  state.settings.month = parseInt(document.getElementById("monthSelect").value, 10);
+  state.settings.year = parseInt(document.getElementById("yearSelect").value, 10);
+  state.settings.daysInMonth = Math.max(1, parseInt(document.getElementById("daysInMonth").value, 10) || 1);
+  state.settings.autoDays = document.getElementById("autoDays").checked;
+  state.settings.allocateOnlyEnteredDays = document.getElementById("allocateToggle").checked;
+};
+
+const renderMonthYear = () => {
+  const monthSelect = document.getElementById("monthSelect");
+  const yearSelect = document.getElementById("yearSelect");
+
+  const months = [
+    "Ocak","Şubat","Mart","Nisan","Mayıs","Haziran",
+    "Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"
+  ];
+  monthSelect.innerHTML = months.map((name, idx) => `<option value="${idx}">${name}</option>`).join("");
+
+  const yearStart = new Date().getFullYear() - 3;
+  const yearEnd = new Date().getFullYear() + 3;
+  const years = [];
+  for (let year = yearStart; year <= yearEnd; year += 1) years.push(year);
+  yearSelect.innerHTML = years.map((year) => `<option value="${year}">${year}</option>`).join("");
+};
+
+const renderExpenses = () => {
+  const tbody = document.querySelector("#expenseTable tbody");
+  tbody.innerHTML = state.expenses.map((expense, index) => `
+    <tr>
+      <td><input type="text" data-expense-name="${index}" value="${expense.name}" /></td>
+      <td class="right"><input type="number" step="1" data-expense-amount="${index}" value="${expense.amount}" /></td>
+      <td class="center"><button class="danger" data-expense-remove="${index}">Sil</button></td>
+    </tr>
+  `).join("");
+
+  tbody.querySelectorAll("input[data-expense-name]").forEach((input) => {
+    input.addEventListener("input", (event) => {
+      const idx = parseInt(event.target.dataset.expenseName, 10);
+      state.expenses[idx].name = event.target.value;
+      updateAll();
+    });
+  });
+  tbody.querySelectorAll("input[data-expense-amount]").forEach((input) => {
+    input.addEventListener("input", (event) => {
+      const idx = parseInt(event.target.dataset.expenseAmount, 10);
+      state.expenses[idx].amount = Math.max(0, number(event.target.value));
+      updateAll();
+    });
+  });
+  tbody.querySelectorAll("button[data-expense-remove]").forEach((btn) => {
+    btn.addEventListener("click", (event) => {
+      const idx = parseInt(event.target.dataset.expenseRemove, 10);
+      state.expenses.splice(idx, 1);
+      renderExpenses();
+      updateAll();
+    });
+  });
+};
+
+const renderSales = () => {
+  const tbody = document.querySelector("#salesTable tbody");
+  tbody.innerHTML = state.sales.map((sale, index) => {
+    const gross = sale.portionQty * state.settings.portionProfit
+      + sale.qty500g * state.settings.profit500g
+      + sale.qty1kg * state.settings.profit1kg;
+    const dailyFixed = getDailyFixedExpense();
+    const real = gross - dailyFixed;
+
+    return `
+      <tr>
+        <td><input type="date" data-sale-date="${index}" value="${sale.date}" /></td>
+        <td class="right"><input type="number" step="1" data-sale-portion="${index}" value="${sale.portionQty}" /></td>
+        <td class="right"><input type="number" step="1" data-sale-500="${index}" value="${sale.qty500g}" /></td>
+        <td class="right"><input type="number" step="1" data-sale-1kg="${index}" value="${sale.qty1kg}" /></td>
+        <td class="right">${currency(gross)}</td>
+        <td class="right">${currency(real)}</td>
+        <td class="center"><button class="danger" data-sale-remove="${index}">Sil</button></td>
+      </tr>
+    `;
+  }).join("");
+
+  tbody.querySelectorAll("input[data-sale-date]").forEach((input) => {
+    input.addEventListener("input", (event) => {
+      const idx = parseInt(event.target.dataset.saleDate, 10);
+      state.sales[idx].date = event.target.value;
+      updateAll();
+    });
+  });
+  tbody.querySelectorAll("input[data-sale-portion]").forEach((input) => {
+    input.addEventListener("input", (event) => {
+      const idx = parseInt(event.target.dataset.salePortion, 10);
+      state.sales[idx].portionQty = Math.max(0, Math.round(number(event.target.value)));
+      updateAll();
+    });
+  });
+  tbody.querySelectorAll("input[data-sale-500]").forEach((input) => {
+    input.addEventListener("input", (event) => {
+      const idx = parseInt(event.target.dataset.sale500, 10);
+      state.sales[idx].qty500g = Math.max(0, Math.round(number(event.target.value)));
+      updateAll();
+    });
+  });
+  tbody.querySelectorAll("input[data-sale-1kg]").forEach((input) => {
+    input.addEventListener("input", (event) => {
+      const idx = parseInt(event.target.dataset.sale1kg, 10);
+      state.sales[idx].qty1kg = Math.max(0, Math.round(number(event.target.value)));
+      updateAll();
+    });
+  });
+  tbody.querySelectorAll("button[data-sale-remove]").forEach((btn) => {
+    btn.addEventListener("click", (event) => {
+      const idx = parseInt(event.target.dataset.saleRemove, 10);
+      state.sales.splice(idx, 1);
+      renderSales();
+      updateAll();
+    });
+  });
+};
+
+const getTotalMonthlyFixed = () => state.expenses.reduce((sum, item) => sum + number(item.amount), 0);
+
+const getDailyFixedExpense = () => {
+  const days = state.settings.daysInMonth || 1;
+  return getTotalMonthlyFixed() / days;
+};
+
+const updateSummary = () => {
+  const totalGross = state.sales.reduce((sum, sale) => {
+    return sum + sale.portionQty * state.settings.portionProfit
+      + sale.qty500g * state.settings.profit500g
+      + sale.qty1kg * state.settings.profit1kg;
+  }, 0);
+
+  const enteredDays = state.sales.length;
+  const totalFixed = state.settings.allocateOnlyEnteredDays
+    ? getDailyFixedExpense() * enteredDays
+    : getTotalMonthlyFixed();
+
+  const totalReal = totalGross - totalFixed;
+
+  document.getElementById("totalGross").textContent = currency(totalGross);
+  document.getElementById("totalFixedAllocated").textContent = currency(totalFixed);
+  document.getElementById("totalReal").textContent = currency(totalReal);
+
+  document.getElementById("totalMonthlyFixed").textContent = currency(getTotalMonthlyFixed());
+  document.getElementById("dailyFixed").textContent = currency(getDailyFixedExpense());
+  document.getElementById("daysDisplay").textContent = String(state.settings.daysInMonth);
+};
+
+const updateAll = () => {
+  syncSettingsFromUI();
+  if (state.settings.autoDays) {
+    state.settings.daysInMonth = getDaysInMonth(state.settings.month, state.settings.year);
+    document.getElementById("daysInMonth").value = state.settings.daysInMonth;
   }
-  s+=(ayran||0)*p["Ayran"].price;
-  s+=(ekmek||0)*p["Ekmek"].price;
-  return s*adet;
-}
-function totalCost(urun,boy,adet=1,ayran=0,ekmek=0){
-  const r=getRecipe(urun,boy); if(!r) return {et:0,salata:0,pack:0,total:0};
-  const p=STATE.prices;
-  const extraPerItem=(r.Ekmek||0)*(p["Ekmek"]?.price??0)+(r.Ayran||0)*(p["Ayran"]?.price??0);
-  const et=costMeat(r)*adet, salata=costSalad(r)*adet, pack=costPack(boy,adet,ayran,ekmek)+(extraPerItem*adet);
-  return {et,salata,pack,total:et+salata+pack};
-}
-function targetForSize(boy){return boy==="1 kg"?num(document.getElementById("targetKg").value):num(document.getElementById("targetSmall").value)}
-function recommendedLabelPrice(maliyet,hedef,k){return k>0?(maliyet+hedef)/k:NaN}
+  renderSales();
+  updateSummary();
+  updateStorage();
+  setStatus("Durum: kaydedildi", "accent");
+};
 
-function renderSelectors(){
-  const urunSel=document.getElementById("urunSel"), boySel=document.getElementById("boySel");
-  const urunler=[...new Set(STATE.recipes.map(r=>r.urun))];
-  urunSel.innerHTML=urunler.map(u=>`<option value="${u}">${u}</option>`).join("");
-  const fillBoy=()=>{const boys=STATE.recipes.filter(r=>r.urun===urunSel.value).map(r=>r.boy); boySel.innerHTML=boys.map(b=>`<option value="${b}">${b}</option>`).join("")}
-  urunSel.addEventListener("change",()=>{fillBoy();refreshQuick()});
-  boySel.addEventListener("change",refreshQuick);
-  fillBoy();
-}
-function renderPrices(){
-  const tbl=document.getElementById("tblPrices");
-  const rows=Object.entries(STATE.prices);
-  tbl.innerHTML=`<thead><tr><th>Kalem</th><th>Birim</th><th class="right">Birim Fiyat (TL)</th></tr></thead>
-  <tbody>${rows.map(([k,v])=>`<tr><td>${k}</td><td class="muted">${v.unit}</td><td class="right"><input data-price="${k}" type="number" step="0.01" value="${v.price}"></td></tr>`).join("")}</tbody>`;
-  tbl.querySelectorAll("input[data-price]").forEach(inp=>{
-    inp.addEventListener("input",e=>{const key=e.target.getAttribute("data-price"); STATE.prices[key].price=num(e.target.value); renderPack(); refreshQuick();});
+const exportData = () => {
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "daily-net-profit.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+};
+
+const importData = (file) => {
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const parsed = JSON.parse(event.target.result);
+      state = {
+        settings: { ...DEFAULT_STATE.settings, ...(parsed.settings || {}) },
+        expenses: Array.isArray(parsed.expenses) ? parsed.expenses : safeClone(DEFAULT_STATE.expenses),
+        sales: Array.isArray(parsed.sales) ? parsed.sales : safeClone(DEFAULT_STATE.sales)
+      };
+      syncSettingsToUI();
+      renderExpenses();
+      renderSales();
+      updateSummary();
+      updateStorage();
+      setStatus("Durum: içe aktarıldı", "accent");
+    } catch (error) {
+      console.error(error);
+      setStatus("Durum: içe aktarma hatası", "danger");
+    }
+  };
+  reader.readAsText(file);
+};
+
+const resetData = () => {
+  state = safeClone(DEFAULT_STATE);
+  syncSettingsToUI();
+  renderExpenses();
+  renderSales();
+  updateSummary();
+  updateStorage();
+  setStatus("Durum: sıfırlandı", "accent");
+};
+
+const loadStorage = () => {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+  try {
+    const parsed = JSON.parse(raw);
+    state = {
+      settings: { ...DEFAULT_STATE.settings, ...(parsed.settings || {}) },
+      expenses: Array.isArray(parsed.expenses) ? parsed.expenses : safeClone(DEFAULT_STATE.expenses),
+      sales: Array.isArray(parsed.sales) ? parsed.sales : safeClone(DEFAULT_STATE.sales)
+    };
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const initEvents = () => {
+  document.getElementById("profitPortion").addEventListener("input", updateAll);
+  document.getElementById("profit500").addEventListener("input", updateAll);
+  document.getElementById("profit1kg").addEventListener("input", updateAll);
+  document.getElementById("monthSelect").addEventListener("change", updateAll);
+  document.getElementById("yearSelect").addEventListener("change", updateAll);
+  document.getElementById("daysInMonth").addEventListener("input", updateAll);
+  document.getElementById("autoDays").addEventListener("change", updateAll);
+  document.getElementById("allocateToggle").addEventListener("change", updateAll);
+
+  document.getElementById("addExpense").addEventListener("click", () => {
+    state.expenses.push({ name: "Yeni Gider", amount: 0 });
+    renderExpenses();
+    updateAll();
   });
-}
-function renderPack(){
-  const tbl=document.getElementById("tblPack");
-  const items=Object.keys(STATE.packBySize["Porsiyon"]);
-  const sizes=Object.keys(STATE.packBySize);
-  tbl.innerHTML=`<thead><tr><th>Kalem</th>${sizes.map(s=>`<th class="right">${s}</th>`).join("")}</tr></thead>
-  <tbody>${items.map(it=>`<tr><td>${it}</td>${sizes.map(s=>`<td class="right"><input data-pack="${it}" data-size="${s}" type="number" step="0.1" value="${STATE.packBySize[s][it]??0}"></td>`).join("")}</tr>`).join("")}
-    <tr><th class="section" colspan="${sizes.length + 1}">Ek Paketleme Kalemleri</th></tr>
-    ${STATE.packExtras.map((row,idx)=>{
-      const item=row?.item||"";
-      const qty=row?.qty??0;
-      const price=STATE.prices[item]?.price??0;
-      const cost=qty*price;
-      return `<tr>
-        <td>
-          <select data-pack-extra-item="${idx}">
-            <option value="">Kalem seç</option>
-            ${Object.keys(STATE.prices).map(key=>`<option value="${key}" ${key===item?"selected":""}>${key}</option>`).join("")}
-          </select>
-        </td>
-        <td class="right"><input data-pack-extra-qty="${idx}" type="number" step="1" min="0" value="${qty}"></td>
-        <td class="right">${fmt(cost)}</td>
-        <td class="right"><button class="btndanger" data-pack-extra-remove="${idx}">Sil</button></td>
-      </tr>`;
-    }).join("")}
-  </tbody>`;
-  tbl.querySelectorAll("input[data-pack]").forEach(inp=>{
-    inp.addEventListener("input",e=>{const it=e.target.getAttribute("data-pack"); const s=e.target.getAttribute("data-size"); STATE.packBySize[s][it]=num(e.target.value); refreshQuick();});
+
+  document.getElementById("addSale").addEventListener("click", () => {
+    state.sales.push({ date: new Date().toISOString().slice(0,10), portionQty: 0, qty500g: 0, qty1kg: 0 });
+    renderSales();
+    updateAll();
   });
-  tbl.querySelectorAll("select[data-pack-extra-item]").forEach(sel=>{
-    sel.addEventListener("change",e=>{
-      const idx=parseInt(e.target.getAttribute("data-pack-extra-item"),10);
-      STATE.packExtras[idx].item=e.target.value;
-      renderPack();refreshQuick();
-    });
+
+  document.getElementById("exportBtn").addEventListener("click", exportData);
+  document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importFile").click());
+  document.getElementById("importFile").addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (file) importData(file);
+    event.target.value = "";
   });
-  tbl.querySelectorAll("input[data-pack-extra-qty]").forEach(inp=>{
-    inp.addEventListener("input",e=>{
-      const idx=parseInt(e.target.getAttribute("data-pack-extra-qty"),10);
-      STATE.packExtras[idx].qty=Math.max(0,Math.round(num(e.target.value)));
-      renderPack();refreshQuick();
-    });
+
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    if (confirm("Tüm verileri sıfırlamak istediğine emin misin?")) {
+      resetData();
+    }
   });
-  tbl.querySelectorAll("button[data-pack-extra-remove]").forEach(btn=>{
-    btn.addEventListener("click",e=>{
-      const idx=parseInt(e.target.getAttribute("data-pack-extra-remove"),10);
-      STATE.packExtras.splice(idx,1);
-      renderPack();refreshQuick();
-    });
+
+  window.addEventListener("beforeunload", updateStorage);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      updateStorage();
+    }
   });
-}
-function renderRecipes(){
-  const tbl=document.getElementById("tblRec");
-  const cols=["Bonfile","Pirzola","Kanat","Köfte","Marul","Domates","Soğan"];
-  const extras=["Ekmek","Ayran"];
-  tbl.innerHTML=`<thead>
-    <tr>
-      <th rowspan="2">Ürün</th>
-      <th rowspan="2">Boy</th>
-      <th class="section" colspan="${cols.length}">Et + Salata</th>
-      <th class="section" colspan="${extras.length}">Ekstralar</th>
-    </tr>
-    <tr>
-      ${cols.map(c=>`<th class="right">${c} (g)</th>`).join("")}
-      ${extras.map(c=>`<th class="right">${c} (adet)</th>`).join("")}
-    </tr>
-  </thead>
-  <tbody>${STATE.recipes.map((r,idx)=>`<tr><td>${r.urun}</td><td class="muted">${r.boy}</td>${cols.map(c=>`<td class="right"><input data-rec="${idx}" data-col="${c}" type="number" step="1" value="${r[c]}"></td>`).join("")}${extras.map(c=>`<td class="right"><input data-rec="${idx}" data-col="${c}" type="number" step="1" min="0" value="${r[c]??0}"></td>`).join("")}</tr>`).join("")}</tbody>`;
-  tbl.querySelectorAll("input[data-rec]").forEach(inp=>{
-    inp.addEventListener("input",e=>{const idx=parseInt(e.target.getAttribute("data-rec"),10); const col=e.target.getAttribute("data-col"); STATE.recipes[idx][col]=Math.max(0,Math.round(num(e.target.value))); refreshQuick();});
-  });
-}
-function renderAll(){
-  const tbl=document.getElementById("tblAll");
-  const k=num(document.getElementById("katsayi").value);
-  const rows=STATE.recipes.map(r=>{
-    const costs=totalCost(r.urun,r.boy,1,0,1);
-    const hedef=targetForSize(r.boy);
-    const etiket=recommendedLabelPrice(costs.total,hedef,k);
-    const netKar=(etiket*k)-costs.total;
-    return {...r,costs,hedef,etiket,netKar};
-  });
-  tbl.innerHTML=`<thead><tr><th>Ürün</th><th>Boy</th><th class="right">Et</th><th class="right">Salata</th><th class="right">Paket</th><th class="right">Toplam</th><th class="right">Hedef</th><th class="right">Etiket</th><th class="right">Net Kâr</th></tr></thead>
-  <tbody>${rows.map(x=>`<tr><td>${x.urun}</td><td class="muted">${x.boy}</td><td class="right">${fmt0(x.costs.et)}</td><td class="right">${fmt0(x.costs.salata)}</td><td class="right">${fmt0(x.costs.pack)}</td><td class="right"><b>${fmt0(x.costs.total)}</b></td><td class="right">${fmt0(x.hedef)}</td><td class="right"><b class="ok">${fmt0(x.etiket)}</b></td><td class="right">${fmt0(x.netKar)}</td></tr>`).join("")}</tbody>`;
-}
+};
 
-function refreshQuick(){
-  const urun=document.getElementById("urunSel").value;
-  const boy=document.getElementById("boySel").value;
-  const adet=Math.max(1,Math.round(num(document.getElementById("adetSel").value)));
-  const ayran=Math.max(0,Math.round(num(document.getElementById("ayranSel").value)));
-  const ekmek=Math.max(0,Math.round(num(document.getElementById("ekmekSel").value)));
-  document.getElementById("adetSel").value=adet;
-  const k=num(document.getElementById("katsayi").value);
-  const hedef=targetForSize(boy)*adet;
-  const costs=totalCost(urun,boy,adet,ayran,ekmek);
-  const etiket=recommendedLabelPrice(costs.total,hedef,k);
-  const netGelir=etiket*k;
-  const netKar=netGelir-costs.total;
+const init = () => {
+  renderMonthYear();
+  loadStorage();
+  if (state.settings.autoDays) {
+    state.settings.daysInMonth = getDaysInMonth(state.settings.month, state.settings.year);
+  }
+  syncSettingsToUI();
+  renderExpenses();
+  renderSales();
+  updateSummary();
+  initEvents();
+  updateStorage();
+};
 
-  document.getElementById("kEt").textContent=fmt(costs.et);
-  document.getElementById("kSalata").textContent=fmt(costs.salata);
-  document.getElementById("kPack").textContent=fmt(costs.pack);
-  document.getElementById("kTop").textContent=fmt(costs.total);
-
-  document.getElementById("kHedef").textContent=fmt(hedef);
-  document.getElementById("kEtiket").textContent=fmt(etiket);
-  document.getElementById("kNetGelir").textContent=fmt(netGelir);
-
-  const nk=document.getElementById("kNetKar");
-  nk.textContent=fmt(netKar);
-  nk.className="v "+(netKar>=hedef*0.98?"acc":(netKar>=0?"warn":"dng"));
-}
-
-function syncParamsFromUI(){
-  STATE.params.c=num(document.getElementById("c").value);
-  STATE.params.v=num(document.getElementById("v").value);
-  STATE.params.cv=num(document.getElementById("cv").value);
-  STATE.params.katsayi=num(document.getElementById("katsayi").value);
-  STATE.params.targetSmall=num(document.getElementById("targetSmall").value);
-  STATE.params.targetKg=num(document.getElementById("targetKg").value);
-}
-function pushParamsToUI(){
-  document.getElementById("c").value=STATE.params.c;
-  document.getElementById("v").value=STATE.params.v;
-  document.getElementById("cv").value=STATE.params.cv;
-  document.getElementById("katsayi").value=STATE.params.katsayi;
-  document.getElementById("targetSmall").value=STATE.params.targetSmall;
-  document.getElementById("targetKg").value=STATE.params.targetKg;
-}
-function save(){
-  syncParamsFromUI();
-  localStorage.setItem(LS_KEY, JSON.stringify(STATE));
-  setPill("Durum: kaydedildi ✅","ok");
-}
-function load(){
-  const raw=localStorage.getItem(LS_KEY);
-  if(!raw){setPill("Durum: kayıt yok","warn");return;}
-  try{
-    STATE=JSON.parse(raw);
-    STATE.params=Object.assign({},DEFAULT.params,STATE.params||{});
-    STATE.prices=Object.assign({},DEFAULT.prices,STATE.prices||{});
-    STATE.packBySize=Object.assign({},DEFAULT.packBySize,STATE.packBySize||{});
-    STATE.packExtras=Array.isArray(STATE.packExtras)
-      ? STATE.packExtras.map(r=>({item:r?.item||"",qty:Math.max(0,Math.round(num(r?.qty)))}))
-      : safeClone(DEFAULT.packExtras);
-    STATE.recipes=Array.isArray(STATE.recipes)
-      ? STATE.recipes.map(r=>({...r,Ekmek:r.Ekmek??0,Ayran:r.Ayran??0}))
-      : safeClone(DEFAULT.recipes);
-    pushParamsToUI();
-    renderAllUI();
-    setPill("Durum: yüklendi ✅","ok");
-  }catch(e){console.error(e);setPill("Durum: yükleme hatası","dng");}
-}
-function resetAll(){
-  STATE=safeClone(DEFAULT);
-  pushParamsToUI();
-  renderAllUI();
-  setPill("Durum: sıfırlandı","warn");
-}
-
-function renderAllUI(){
-  renderSelectors();renderPrices();renderPack();renderRecipes();refreshQuick();renderAll();
-}
-
-document.getElementById("calcK").addEventListener("click",()=>{
-  const c=num(document.getElementById("c").value);
-  const v=num(document.getElementById("v").value);
-  const cv=num(document.getElementById("cv").value);
-  document.getElementById("katsayi").value=computeKatsayi(c,v,cv).toFixed(3);
-  setPill("Katsayı hesaplandı (yaklaşık)","warn");
-  refreshQuick();renderAll();
-});
-["c","v","cv","katsayi","targetSmall","targetKg"].forEach(id=>document.getElementById(id).addEventListener("input",()=>{refreshQuick()}));
-["adetSel","ayranSel","ekmekSel"].forEach(id=>document.getElementById(id).addEventListener("input",refreshQuick));
-document.getElementById("saveBtn").addEventListener("click",save);
-document.getElementById("loadBtn").addEventListener("click",load);
-document.getElementById("resetBtn").addEventListener("click",()=>{ if(confirm("Ekranı varsayılana döndüreyim mi?")) resetAll(); });
-document.getElementById("refreshAll").addEventListener("click",()=>{renderAll(); setPill("Özet yenilendi","ok");});
-document.getElementById("addPackExtra").addEventListener("click",()=>{
-  STATE.packExtras.push({item:"",qty:0});
-  renderPack();refreshQuick();
-});
-
-pushParamsToUI();
-renderAllUI();
-setPill("Durum: hazır ✅","ok");
+init();
 </script>
 </body>
 </html>
