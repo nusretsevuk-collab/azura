@@ -140,7 +140,7 @@ tr:hover td{background:rgba(255,255,255,.1)}
       <div class="row" style="margin-top:10px;">
         <div class="col"><button id="saveBtn">Kaydet</button></div>
         <div class="col"><button class="btn2" id="loadBtn">Yükle</button></div>
-        <div class="col"><button class="btndanger" id="resetBtn">Sıfırla</button></div>
+        <div class="col"><button class="btndanger" id="resetBtn">Verileri Sıfırla</button></div>
       </div>
 
       <div class="mini">Kaydet/Yükle tarayıcı hafızasına (localStorage) yazar/okur.</div>
@@ -267,10 +267,13 @@ const DEFAULT = {
   ]
 };
 const LS_KEY="maliyet_app_v2_dynamic_pack";
+const FIELD_LS_KEY="maliyet_app_field_state_v1";
 const safeClone = typeof structuredClone === "function"
   ? structuredClone
   : (obj) => JSON.parse(JSON.stringify(obj));
 let STATE=safeClone(DEFAULT);
+let FIELD_STATE={};
+const TRACKED_FIELDS=new WeakSet();
 
 const fmt=n=>isFinite(n)?new Intl.NumberFormat("tr-TR",{minimumFractionDigits:2,maximumFractionDigits:2}).format(n)+" TL":"-";
 const fmt0=n=>isFinite(n)?new Intl.NumberFormat("tr-TR",{maximumFractionDigits:0}).format(n)+" TL":"-";
@@ -387,6 +390,7 @@ function renderPack(){
       const idx=parseInt(e.target.getAttribute("data-pack-extra-remove"),10);
       STATE.packExtras.splice(idx,1);
       renderPack();refreshQuick();
+      scheduleStateSave();
     });
   });
 }
@@ -469,9 +473,17 @@ function pushParamsToUI(){
   document.getElementById("targetSmall").value=STATE.params.targetSmall;
   document.getElementById("targetKg").value=STATE.params.targetKg;
 }
-function save(){
+let STATE_SAVE_TIMER=null;
+function saveStateSilently(){
   syncParamsFromUI();
   localStorage.setItem(LS_KEY, JSON.stringify(STATE));
+}
+function scheduleStateSave(){
+  clearTimeout(STATE_SAVE_TIMER);
+  STATE_SAVE_TIMER=setTimeout(saveStateSilently,150);
+}
+function save(){
+  saveStateSilently();
   setPill("Durum: kaydedildi ✅","ok");
 }
 function load(){
@@ -491,6 +503,7 @@ function load(){
     pushParamsToUI();
     renderAllUI();
     setPill("Durum: yüklendi ✅","ok");
+    storeAllFields();
   }catch(e){console.error(e);setPill("Durum: yükleme hatası","dng");}
 }
 function resetAll(){
@@ -498,6 +511,146 @@ function resetAll(){
   pushParamsToUI();
   renderAllUI();
   setPill("Durum: sıfırlandı","warn");
+  storeAllFields();
+}
+
+function getAllFields(root=document){
+  return Array.from(root.querySelectorAll("input, select, textarea"));
+}
+function isTrackableField(el){
+  if(!el || el.disabled) return false;
+  if(el.tagName.toLowerCase()==="input"){
+    const type=(el.getAttribute("type")||"").toLowerCase();
+    if(["button","submit","reset","hidden","file"].includes(type)) return false;
+  }
+  return true;
+}
+function getDomPath(el){
+  const parts=[];
+  let node=el;
+  while(node && node.nodeType===1 && node!==document.body && node!==document.documentElement){
+    let part=node.tagName.toLowerCase();
+    if(node.id){
+      part+=`#${node.id}`;
+    }else{
+      const parent=node.parentElement;
+      if(parent){
+        const siblings=[...parent.children].filter(child=>child.tagName===node.tagName);
+        const index=siblings.indexOf(node)+1;
+        part+=`:nth-of-type(${index})`;
+      }
+    }
+    parts.unshift(part);
+    node=node.parentElement;
+  }
+  return parts.join(">");
+}
+function getFieldBaseKey(el){
+  return el.dataset.key||el.getAttribute("name")||el.id||getDomPath(el);
+}
+function getFieldKey(el){
+  const base=getFieldBaseKey(el);
+  const path=getDomPath(el);
+  return base===path?base:`${base}::${path}`;
+}
+function getFieldValue(el){
+  if(el.type==="checkbox"||el.type==="radio") return el.checked;
+  return el.value;
+}
+function setFieldValue(el,value){
+  if(el.type==="checkbox"||el.type==="radio"){
+    el.checked=Boolean(value);
+  }else if(value!==undefined && value!==null){
+    el.value=value;
+  }
+}
+function loadFieldState(){
+  try{
+    FIELD_STATE=JSON.parse(localStorage.getItem(FIELD_LS_KEY)||"{}")||{};
+  }catch(e){
+    console.error(e);
+    FIELD_STATE={};
+  }
+}
+function persistFieldState(){
+  localStorage.setItem(FIELD_LS_KEY, JSON.stringify(FIELD_STATE));
+}
+function updateFieldState(el){
+  if(!isTrackableField(el)) return;
+  const key=getFieldKey(el);
+  FIELD_STATE[key]=getFieldValue(el);
+  persistFieldState();
+  scheduleStateSave();
+}
+function registerField(el){
+  if(!isTrackableField(el) || TRACKED_FIELDS.has(el)) return;
+  TRACKED_FIELDS.add(el);
+  const isChoice=el.type==="checkbox"||el.type==="radio"||el.tagName.toLowerCase()==="select";
+  const eventName=isChoice?"change":"input";
+  el.addEventListener(eventName,()=>updateFieldState(el));
+  if(eventName==="change" && el.tagName.toLowerCase()!=="select"){
+    el.addEventListener("input",()=>updateFieldState(el));
+  }
+}
+function applyStoredValues(root=document){
+  getAllFields(root).forEach(el=>{
+    if(!isTrackableField(el)) return;
+    const key=getFieldKey(el);
+    if(Object.prototype.hasOwnProperty.call(FIELD_STATE,key)){
+      const prev=getFieldValue(el);
+      setFieldValue(el, FIELD_STATE[key]);
+      if(getFieldValue(el)!==prev){
+        const isChoice=el.type==="checkbox"||el.type==="radio"||el.tagName.toLowerCase()==="select";
+        const eventName=isChoice?"change":"input";
+        el.dispatchEvent(new Event(eventName,{bubbles:true}));
+      }
+    }
+    registerField(el);
+  });
+}
+function storeAllFields(){
+  getAllFields().forEach(el=>{
+    if(!isTrackableField(el)) return;
+    FIELD_STATE[getFieldKey(el)]=getFieldValue(el);
+  });
+  persistFieldState();
+}
+function initFieldPersistence(){
+  loadFieldState();
+  applyStoredValues();
+  const observer=new MutationObserver(mutations=>{
+    const added=[];
+    mutations.forEach(mutation=>{
+      mutation.addedNodes.forEach(node=>{
+        if(node.nodeType!==1) return;
+        if(node.matches && node.matches("input, select, textarea")) added.push(node);
+        if(node.querySelectorAll) added.push(...node.querySelectorAll("input, select, textarea"));
+      });
+    });
+    if(added.length){
+      added.forEach(el=>{
+        if(!isTrackableField(el)) return;
+        registerField(el);
+        const key=getFieldKey(el);
+        if(Object.prototype.hasOwnProperty.call(FIELD_STATE,key)){
+          const prev=getFieldValue(el);
+          setFieldValue(el, FIELD_STATE[key]);
+          if(getFieldValue(el)!==prev){
+            const isChoice=el.type==="checkbox"||el.type==="radio"||el.tagName.toLowerCase()==="select";
+            const eventName=isChoice?"change":"input";
+            el.dispatchEvent(new Event(eventName,{bubbles:true}));
+          }
+        }
+      });
+    }
+  });
+  observer.observe(document.body,{childList:true,subtree:true});
+  refreshQuick();
+  renderAll();
+}
+function clearFieldState(){
+  FIELD_STATE={};
+  localStorage.removeItem(FIELD_LS_KEY);
 }
 
 function renderAllUI(){
@@ -516,16 +669,28 @@ document.getElementById("calcK").addEventListener("click",()=>{
 ["adetSel","ayranSel","ekmekSel"].forEach(id=>document.getElementById(id).addEventListener("input",refreshQuick));
 document.getElementById("saveBtn").addEventListener("click",save);
 document.getElementById("loadBtn").addEventListener("click",load);
-document.getElementById("resetBtn").addEventListener("click",()=>{ if(confirm("Ekranı varsayılana döndüreyim mi?")) resetAll(); });
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  if(confirm("Tüm verileri sıfırlayıp varsayılana döndüreyim mi?")){
+    localStorage.removeItem(LS_KEY);
+    clearFieldState();
+    resetAll();
+  }
+});
 document.getElementById("refreshAll").addEventListener("click",()=>{renderAll(); setPill("Özet yenilendi","ok");});
 document.getElementById("addPackExtra").addEventListener("click",()=>{
   STATE.packExtras.push({item:"",qty:0});
   renderPack();refreshQuick();
+  scheduleStateSave();
 });
 
-pushParamsToUI();
-renderAllUI();
-setPill("Durum: hazır ✅","ok");
+if(localStorage.getItem(LS_KEY)){
+  load();
+}else{
+  pushParamsToUI();
+  renderAllUI();
+  setPill("Durum: hazır ✅","ok");
+}
+initFieldPersistence();
 </script>
   <a href="https://nusretsevuk-collab.github.io/maliyet-robotu/"
    target="_blank" rel="noopener noreferrer"
