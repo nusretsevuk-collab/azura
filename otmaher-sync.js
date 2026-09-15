@@ -2,6 +2,7 @@
   'use strict';
   const URL_KEY='otmaher_sync_url_v1';
   const CACHE_KEY='otmaher_sync_cache_v1';
+  const AUTO_SYNC_MS=5*60*1000;
 
   function n(v){ const x=parseFloat(String(v??'').replace(',','.')); return Number.isFinite(x)?x:0; }
   function normalizePriceName(name){
@@ -26,10 +27,16 @@
       STATE.prices=merged;
     }
     if(data.packBySize && Object.keys(data.packBySize).length) STATE.packBySize=data.packBySize;
-    if(Array.isArray(data.recipes) && data.recipes.length) STATE.recipes=data.recipes;
+    if(Array.isArray(data.recipes) && data.recipes.length){
+      // Azura mevcut modelinde ekmek hizli hesap alanindan ekleniyor.
+      // OTMAHER recetesindeki ekmegi burada ikinci kez maliyete bindirmiyoruz.
+      STATE.recipes=data.recipes.map(r=>Object.assign({},r,{Ekmek:0}));
+    }
 
     if(typeof pushParamsToUI==='function') pushParamsToUI();
     if(typeof renderAllUI==='function') renderAllUI();
+    // Eski tarayici alan hafizasi, yeni OTMAHER fiyatlarini geri ezmesin.
+    if(typeof storeAllFields==='function') storeAllFields();
     if(typeof saveStateSilently==='function') saveStateSilently();
     localStorage.setItem(CACHE_KEY,JSON.stringify(data));
     if(typeof setPill==='function') setPill('OTMAHER ile senkron ✅','ok');
@@ -77,11 +84,22 @@
     }
   }
 
+  function startAutoSync(){
+    setTimeout(sync,0);
+    setInterval(sync,AUTO_SYNC_MS);
+  }
+
   window.OTMAHER_SYNC={
     sync,
     setUrl(url){ localStorage.setItem(URL_KEY,String(url||'').trim()); return sync(); },
     clearUrl(){ localStorage.removeItem(URL_KEY); },
     getUrl
   };
-  window.addEventListener('load',()=>setTimeout(sync,0));
+
+  // Bu dosya iframe yuklendikten sonra eklenebildigi icin sadece window.load'a guvenme.
+  if(document.readyState==='loading'){
+    window.addEventListener('load',startAutoSync,{once:true});
+  }else{
+    startAutoSync();
+  }
 })();
