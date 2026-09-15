@@ -16,9 +16,7 @@
     if(!data||data.ok!==true) throw new Error(data?.error||'OTMAHER verisi geçersiz');
     if(typeof STATE==='undefined') throw new Error('Azura STATE bulunamadı');
 
-    if(data.params){
-      STATE.params=Object.assign({},STATE.params||{},data.params);
-    }
+    if(data.params) STATE.params=Object.assign({},STATE.params||{},data.params);
     if(data.prices){
       const merged=Object.assign({},STATE.prices||{});
       Object.entries(data.prices).forEach(([key,val])=>{
@@ -27,12 +25,8 @@
       });
       STATE.prices=merged;
     }
-    if(data.packBySize && Object.keys(data.packBySize).length){
-      STATE.packBySize=data.packBySize;
-    }
-    if(Array.isArray(data.recipes) && data.recipes.length){
-      STATE.recipes=data.recipes;
-    }
+    if(data.packBySize && Object.keys(data.packBySize).length) STATE.packBySize=data.packBySize;
+    if(Array.isArray(data.recipes) && data.recipes.length) STATE.recipes=data.recipes;
 
     if(typeof pushParamsToUI==='function') pushParamsToUI();
     if(typeof renderAllUI==='function') renderAllUI();
@@ -40,15 +34,32 @@
     localStorage.setItem(CACHE_KEY,JSON.stringify(data));
     if(typeof setPill==='function') setPill('OTMAHER ile senkron ✅','ok');
   }
+
+  function jsonp(baseUrl){
+    return new Promise((resolve,reject)=>{
+      const cb='__otmaherCb_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+      const sep=baseUrl.includes('?')?'&':'?';
+      const script=document.createElement('script');
+      const timer=setTimeout(()=>cleanup(new Error('OTMAHER zaman aşımı')),15000);
+      function cleanup(err,data){
+        clearTimeout(timer);
+        try{ delete window[cb]; }catch(_e){ window[cb]=undefined; }
+        script.remove();
+        err?reject(err):resolve(data);
+      }
+      window[cb]=data=>cleanup(null,data);
+      script.onerror=()=>cleanup(new Error('OTMAHER bağlantı hatası'));
+      script.src=baseUrl+sep+'action=azura&prefix='+encodeURIComponent(cb)+'&_='+Date.now();
+      document.head.appendChild(script);
+    });
+  }
+
   async function sync(){
     const url=getUrl();
     if(!url) return false;
     try{
       if(typeof setPill==='function') setPill('OTMAHER verisi alınıyor…','warn');
-      const sep=url.includes('?')?'&':'?';
-      const res=await fetch(url+sep+'action=azura&_='+Date.now(),{method:'GET',cache:'no-store'});
-      if(!res.ok) throw new Error('HTTP '+res.status);
-      const data=await res.json();
+      const data=await jsonp(url);
       applyData(data);
       return true;
     }catch(err){
