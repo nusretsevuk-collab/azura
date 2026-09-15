@@ -13,6 +13,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050a18}ifr
 <iframe id="app" src="app.html"></iframe>
 <button id="syncBtn" type="button">OTMAHER Senkron</button>
 <script>
+const OTMAHER_EXEC_URL='https://script.google.com/macros/s/AKfycbxhHF-rOtlVAYoKk9tMd1jIDzqGf8fktQF_Acl2arUvcn_7penM7VY6cab4sgZGNL-m/exec';
 const frame=document.getElementById('app');
 frame.addEventListener('load',()=>{
   const d=frame.contentDocument;
@@ -25,13 +26,10 @@ frame.addEventListener('load',()=>{
 document.getElementById('syncBtn').addEventListener('click',()=>{
   const w=frame.contentWindow;
   const current=w.OTMAHER_SYNC?.getUrl?.()||'';
-  const url=prompt('Apps Script /exec adresini gir:',current.split('?')[0]||'');
-  if(!url) return;
   const oldKey=(current.match(/[?&]key=([^&]+)/)||[])[1]||'';
   const key=prompt('AZURA_SYNC_KEY değerini gir:',oldKey?decodeURIComponent(oldKey):'');
   if(!key) return;
-  const sep=url.includes('?')?'&':'?';
-  const full=url+sep+'key='+encodeURIComponent(key);
+  const full=OTMAHER_EXEC_URL+'?key='+encodeURIComponent(key);
   if(w.OTMAHER_SYNC?.setUrl){ w.OTMAHER_SYNC.setUrl(full); }
   else alert('Senkron modülü henüz yüklenmedi. Birkaç saniye sonra tekrar dene.');
 });
